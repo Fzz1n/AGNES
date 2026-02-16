@@ -1,5 +1,5 @@
 # Artificial Generative Nested Environment System (AGNES)
-Short 2 line intro3
+**AGNES** is a specialized home assistant that can be fully customized to your preferences while also including all the standard features of a typical home assistant, such as controlling lights, heating, and sensors.
 
 ## Features
 **Must have**:
@@ -50,7 +50,7 @@ git clone https://github.com/Fzz1n/AGNES.git
 ```
 2. Navigate to the project directory:
 ```bash
-cd AGNES/AGNES
+cd AGNES
 ```
 3. Create venv folder
 ```bash
