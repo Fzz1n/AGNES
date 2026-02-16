@@ -1,0 +1,75 @@
+import os
+import time
+import playsound
+from gtts import gTTS
+import speech_recognition as sr
+
+from src import calc
+from src import converter
+from src import timer
+
+def speak(text):
+    tts = gTTS(text=text, lang="en")
+    filename = "voice.mp3"
+    tts.save(filename)
+    playsound.playsound(filename)
+    os.remove("voice.mp3")
+
+def get_audio(r, source, lang="en-US"):
+    while True:
+        try:
+            audio = r.listen(source, phrase_time_limit=8)
+            said = r.recognize_google(audio, language=lang) # Danish -> da-DK || English(US) -> en-US
+            print("You said:", said.lower())
+            return said.lower()
+
+        except sr.WaitTimeoutError:
+            print("Ingen lyd registreret")
+            continue
+        
+        except sr.UnknownValueError:
+            print("Couldn't understand audio")
+            continue
+        
+        except sr.RequestError as e:
+            print("Google API fejl:", e)
+
+def main():
+    r = sr.Recognizer()
+    r.dynamic_energy_threshold = False
+    r.energy_threshold = 200
+    r.listen
+    
+    with sr.Microphone() as source:
+        print("Energy threshold:", r.energy_threshold)
+        
+        while True:    
+            text = get_audio(r, source, "en-US")
+
+            if "hello" in text:
+                speak("hello, how are you?")
+            elif "what's your name" in text:
+                speak("My name is AGNES")
+            elif "what does agnes stand for" in text:
+                speak("It stands for: Artificial Generative Nested Environment System")
+            elif "energy threshold" in text:
+                if "change" in text:
+                    number = converter.get_number(text)
+                    r.energy_threshold = number
+                    speak(f"energy threshold is now changed to: {number}")
+                elif "reading" in text:
+                    speak(f"{round(r.energy_threshold, 2)}")
+                elif "deactivate dynamic" in text:
+                    r.dynamic_energy_threshold = False
+                    r.energy_threshold = 200
+                    speak("dynamic energy threshold is now deactivated")
+                elif "activate dynamic" in text:
+                    r.dynamic_energy_threshold = True
+                    speak("dynamic energy threshold is now activated")
+            elif "deactivate microphone" in text:
+                speak("copy that")
+                speak(timer.countdown(converter.get_time(text)))
+            elif "exit" in text:
+                print("Exiting program...")
+                break
+main()
