@@ -90,8 +90,8 @@ git pull
 
 2. Create a branch for your feature or bugfix:
 ```bash
-git switch -c feat/your-name/feature-name
-git switch -c bugfix/your-name/bug-name
+git switch -c feat/feature-name
+git switch -c bugfix/bug-name
 ```
 
 3. Commit your changes:
