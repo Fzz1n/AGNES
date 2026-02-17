@@ -14,6 +14,10 @@ def speak(text):
     tts.save(filename)
     playsound.playsound(filename)
     os.remove("voice.mp3")
+    
+def play_mp3(soundname):
+    dir = "src/mp3_files/"
+    playsound.playsound(dir + soundname + ".mp3")
 
 def get_audio(r, source, lang="en-US"):
     while True:
@@ -69,6 +73,8 @@ def main():
             elif "deactivate microphone" in text:
                 speak("copy that")
                 speak(timer.countdown(converter.get_time(text)))
+            elif "ob1" in text:
+                play_mp3("Obi-Wan")
             elif "exit" in text:
                 print("Exiting program...")
                 break
