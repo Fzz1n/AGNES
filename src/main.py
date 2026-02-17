@@ -73,6 +73,9 @@ def main():
             elif "deactivate microphone" in text:
                 speak("copy that")
                 speak(timer.countdown(converter.get_time(text)))
+            elif "rice" in text:
+                number = converter.get_number(text)
+                speak(f"{calc.water_to_rice(number)}")
             elif "ob1" in text:
                 play_mp3("Obi-Wan")
             elif "exit" in text:
