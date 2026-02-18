@@ -76,7 +76,7 @@ def main():
             elif "rice" in text:
                 number = converter.get_number(text)
                 speak(f"{calc.water_to_rice(number)}")
-            elif "ob1" in text:
+            elif "obi-wan" in text:
                 play_mp3("Obi-Wan")
             elif "exit" in text:
                 print("Exiting program...")
