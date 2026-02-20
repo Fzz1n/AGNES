@@ -1,9 +1,11 @@
 import os
 import time
+import threading
 import playsound
 from gtts import gTTS
 import speech_recognition as sr
 
+from src import sound_effects
 from src import calc
 from src import converter
 from src import timer
@@ -14,12 +16,8 @@ def speak(text):
     tts.save(filename)
     playsound.playsound(filename)
     os.remove("voice.mp3")
-    
-def play_mp3(soundname):
-    dir = "src/mp3_files/"
-    playsound.playsound(dir + soundname + ".mp3")
 
-def get_audio(r, source, lang="en-US"):
+def get_audio(r, source, lang):
     while True:
         try:
             audio = r.listen(source, phrase_time_limit=8)
@@ -50,6 +48,9 @@ def main():
         while True:    
             text = get_audio(r, source, "en-US")
 
+            if "69" in text:
+                sound_effects.play_mp3("nice_meme")
+            
             if "hello" in text:
                 speak("hello, how are you?")
             elif "what's your name" in text:
@@ -72,13 +73,44 @@ def main():
                     speak("dynamic energy threshold is now activated")
             elif "deactivate microphone" in text:
                 speak("copy that")
-                speak(timer.countdown(converter.get_time(text)))
+                timer.start_timer(text)
+                speak("I'm back bitches!!")
+            elif "timer" in text:
+                t = threading.Thread(target=timer.start_timer, args=(text,))
+                t.start()
             elif "rice" in text:
-                number = converter.get_number(text)
-                speak(f"{calc.water_to_rice(number)}")
-            elif "obi-wan" in text:
-                play_mp3("Obi-Wan")
+                speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
+            elif "play" in text:
+                if "obi-wan" in text:
+                    sound_effects.play_mp3("Obi-Wan")
             elif "exit" in text:
                 print("Exiting program...")
                 break
 main()
+
+'''
+import threading
+import time
+
+def function1():
+    while True:
+        print("Function 1")
+        time.sleep(1)  # Delay for 1 second
+
+def function2():
+    while True:
+        print("Function 2")
+        time.sleep(1)  # Delay for 1 second
+
+# Create threads for each function
+thread1 = threading.Thread(target=function1)
+thread2 = threading.Thread(target=function2)
+
+# Start the threads
+thread1.start()
+thread2.start()
+
+# Keep the main thread running
+while True:
+    pass
+'''
