@@ -80,6 +80,17 @@ def main():
                 t.start()
             elif "rice" in text:
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
+            elif "what" in text:
+                if "time" in text:
+                    speak(timer.current_time())
+                elif "todays date" in text:
+                    speak(timer.todays_date())
+                elif "day is it today" in text:
+                    speak(timer.todays_weekday_name())
+                elif "month" in text:
+                    speak(timer.current_month_name())
+                elif "week" in text:
+                    speak(timer.current_week_number())
             elif "play" in text:
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
@@ -87,30 +98,3 @@ def main():
                 print("Exiting program...")
                 break
 main()
-
-'''
-import threading
-import time
-
-def function1():
-    while True:
-        print("Function 1")
-        time.sleep(1)  # Delay for 1 second
-
-def function2():
-    while True:
-        print("Function 2")
-        time.sleep(1)  # Delay for 1 second
-
-# Create threads for each function
-thread1 = threading.Thread(target=function1)
-thread2 = threading.Thread(target=function2)
-
-# Start the threads
-thread1.start()
-thread2.start()
-
-# Keep the main thread running
-while True:
-    pass
-'''
