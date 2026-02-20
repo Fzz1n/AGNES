@@ -28,10 +28,13 @@
 ## Project Structure
 ```plaintext
 src/
-├── calc.py         # Calculation and eaquations
-├── converter.py    # Converts to and from diff. vaules
-├── main.py         # Communication (I/O)
-└── timer.py        # Set diff. timers for user
+├── mp3_files/          # Diff. sound clips
+├── calc.py             # Calculation and eaquations
+├── converter.py        # Converts to and from diff. vaules
+├── IoT.py              # Communication to and from Internet of Things
+├── main.py             # Communication (I/O)
+├── sound_effects.py    # Playing diff. files
+└── timer.py            # Set diff. timers for user
 ```
 
 ## Getting Started
