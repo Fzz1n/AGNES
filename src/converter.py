@@ -5,6 +5,14 @@ def string_to_int(s):
     except ValueError:
         #print("Invalid input: cannot convert to integer")
         return ""
+    
+def string_to_float(s):
+    try:
+        num = float(s)
+        return num
+    except ValueError:
+        #print("Invalid input: cannot convert to integer")
+        return ""
 
 def get_number(text):
     array = text.split(" ")
@@ -15,6 +23,17 @@ def get_number(text):
             num = res
             break
     return num
+
+def get_number_and_unit(text):
+    text_array = text.split(" ")
+    res_array = []
+    for i, item in enumerate(text_array):
+        res = string_to_float(item)
+        if res != "":
+            res_array.append(res)
+            res_array.append(text_array[i + 1])
+            break
+    return res_array
 
 def get_time(text):
     number = get_number(text)
