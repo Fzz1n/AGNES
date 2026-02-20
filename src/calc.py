@@ -1,3 +1,15 @@
+
+# Simpel calc.
+def addition(n1, n2):
+    return n1 + n2
+def subtraction(n1, n2):
+    return n1 - n2
+def multiplication(n1, n2):
+    return n1 - n2
+def division (n1, n2):
+    return n1 / n2
+
+# Finding the procentage of a number
 def ingers_equation(value1 = None, value2 = None, proc1 = None, proc2 = None):
     if value1 != None and proc1 == None and proc2 == None:
         return (value1 / proc1) * proc2
@@ -8,6 +20,7 @@ def ingers_equation(value1 = None, value2 = None, proc1 = None, proc2 = None):
         return (value2 * proc1) / value1
     return None
 
+# Warter to rice ration calc.
 def water_to_rice(info):
     if len(info) == 0:
         return "sorry i don't understand"
