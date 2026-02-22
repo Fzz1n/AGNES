@@ -94,6 +94,8 @@ def main():
             elif "play" in text:
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
+                elif "game" in text:
+                    sound_effects.play_mp3("game_on")
             elif "exit" in text:
                 print("Exiting program...")
                 break
