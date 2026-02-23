@@ -80,6 +80,17 @@ def main():
                 t.start()
             elif "rice" in text:
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
+            elif "what" in text:
+                if "time" in text:
+                    speak(timer.current_time())
+                elif "todays date" in text:
+                    speak(timer.todays_date())
+                elif "day is it today" in text:
+                    speak(timer.todays_weekday_name())
+                elif "month" in text:
+                    speak(timer.current_month_name())
+                elif "week" in text:
+                    speak(timer.current_week_number())
             elif "play" in text:
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
