@@ -83,34 +83,10 @@ def main():
             elif "play" in text:
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
+            elif "adjust" in text:
+                if "sound" in text:
+                    sound_effects.adjust_sound(converter.get_number(text))
             elif "exit" in text:
                 print("Exiting program...")
                 break
 main()
-
-'''
-import threading
-import time
-
-def function1():
-    while True:
-        print("Function 1")
-        time.sleep(1)  # Delay for 1 second
-
-def function2():
-    while True:
-        print("Function 2")
-        time.sleep(1)  # Delay for 1 second
-
-# Create threads for each function
-thread1 = threading.Thread(target=function1)
-thread2 = threading.Thread(target=function2)
-
-# Start the threads
-thread1.start()
-thread2.start()
-
-# Keep the main thread running
-while True:
-    pass
-'''
