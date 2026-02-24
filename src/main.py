@@ -9,6 +9,7 @@ from src import sound_effects
 from src import calc
 from src import converter
 from src import timer
+from src.IoT import light 
 
 def speak(text):
     tts = gTTS(text=text, lang="en")
@@ -99,6 +100,8 @@ def main():
             elif "adjust" in text:
                 if "sound" in text:
                     sound_effects.adjust_sound(converter.get_number(text))
+            elif "light" in text or "ture" in text or "going to bed" in text:
+                light.controlling_lights(text)
             elif "exit" in text:
                 print("Exiting program...")
                 break
