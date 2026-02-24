@@ -67,7 +67,7 @@ def get_status(url):
 	except:
 		print("GET error. Try again later")
 	else:
-		# command to extract info
+		# Command to extract info
 		response = r.json()
 		for item in response:
 			if item == "state" or item == "action":
@@ -124,6 +124,3 @@ def controlling_lights(command):
 	if isinstance(response, list) and "success" in response[0]:
 		return ""
 	return "an error acure"
-
-print(controlling_lights("set floor lamp to 60"))
-print(controlling_lights("status floor lamp"))
