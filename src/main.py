@@ -9,7 +9,9 @@ from src import sound_effects
 from src import calc
 from src import converter
 from src import timer
-from src.IoT import light 
+from src.IoT import light
+
+misunderstanding_counter = 0
 
 def speak(text):
     tts = gTTS(text=text, lang="en")
@@ -19,6 +21,7 @@ def speak(text):
     os.remove("voice.mp3")
 
 def get_audio(r, source, lang):
+    global misunderstanding_counter
     while True:
         try:
             audio = r.listen(source, phrase_time_limit=8)
@@ -31,6 +34,7 @@ def get_audio(r, source, lang):
             continue
         
         except sr.UnknownValueError:
+            misunderstanding_counter += 1
             print("Couldn't understand audio")
             continue
         
@@ -38,6 +42,7 @@ def get_audio(r, source, lang):
             print("Google API fejl:", e)
 
 def main():
+    global misunderstanding_counter
     r = sr.Recognizer()
     r.dynamic_energy_threshold = False
     r.energy_threshold = 200
@@ -102,6 +107,12 @@ def main():
                     sound_effects.adjust_sound(converter.get_number(text))
             elif "light" in text or "ture" in text or "going to bed" in text:
                 light.controlling_lights(text)
+            elif "misunderstanding counter" in text:
+                if "reset" in text:
+                    misunderstanding_counter = 0
+                    speak("counter is not set to: 0")
+                else:
+                    speak(f"The counter is now: {misunderstanding_counter}")
             elif "exit" in text:
                 print("Exiting program...")
                 break
