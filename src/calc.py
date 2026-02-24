@@ -10,13 +10,13 @@ def division (n1, n2):
     return n1 / n2
 
 # Finding the procentage of a number
-def ingers_equation(value1 = None, value2 = None, proc1 = None, proc2 = None):
-    if value1 != None and proc1 == None and proc2 == None:
+def ingers_equation(value1, value2, proc1 = None, proc2 = None):
+    if value1 is not None and proc1 is not None and proc2 is not None:
         return (value1 / proc1) * proc2
-    elif value1 != None and value2 != None and proc1 == None and proc2 == None:
+    elif value1 is not None and value2 is not None and proc1 is None and proc2 is None:
         proc1 = 100
-        return (value2 * proc1) / value2
-    elif value1 != None and value2 != None and proc1 != None and proc2 == None:
+        return (value2 * proc1) / value1
+    elif value1 is not None and value2 is not None and proc1 is not None and proc2 is None:
         return (value2 * proc1) / value1
     return None
 
