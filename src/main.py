@@ -63,6 +63,8 @@ def main():
                 speak("My name is AGNES")
             elif "what does agnes stand for" in text:
                 speak("It stands for: Artificial Generative Nested Environment System")
+            elif "who are you" in text:
+                sound_effects.play_mp3("kazoo_kid")
             elif "energy threshold" in text:
                 if "change" in text:
                     number = converter.get_number(text)
@@ -113,6 +115,10 @@ def main():
                     speak("counter is not set to: 0")
                 else:
                     speak(f"The counter is now: {misunderstanding_counter}")
+            elif "joke" in text:
+                speak("what do you call a cow without legs.")
+                time.sleep(5)
+                speak("ground beef")
             elif "exit" in text:
                 print("Exiting program...")
                 break
