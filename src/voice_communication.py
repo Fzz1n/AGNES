@@ -1,5 +1,6 @@
 import os
-import playsound
+import platform
+import subprocess
 from gtts import gTTS
 import speech_recognition as sr
 
@@ -9,8 +10,15 @@ def speak(text):
     tts = gTTS(text=text, lang="en")
     filename = "voice.mp3"
     tts.save(filename)
-    playsound.playsound(filename)
-    os.remove("voice.mp3")
+
+    system = platform.system()
+
+    if system == "Linux":
+        subprocess.run(["mpg123", "-q", filename])
+    elif system == "Windows":
+        os.startfile(filename)
+
+    os.remove(filename)
 
 def get_audio(r, source, lang):
     while True:
