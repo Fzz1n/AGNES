@@ -107,4 +107,12 @@ git commit
 ```bash
 git push origin feature-name
 ```
-5. Open a pull request to the staging branch, test it, and then create a new pull request for main.
+5. Open a pull request to the staging branch, test it.
+
+6. Create a new pull request for main.
+```bash
+git checkout main
+git pull origin main
+git merge staging
+git push origin main
+```
