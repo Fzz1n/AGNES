@@ -15,6 +15,7 @@ def string_to_float(s):
         return ""
 
 def get_number(text):
+    text = text.replace("%", "")
     array = text.split(" ")
     num = 0
     for item in array:

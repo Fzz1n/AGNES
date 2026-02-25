@@ -1,0 +1,1 @@
+misunderstanding_counter = 0

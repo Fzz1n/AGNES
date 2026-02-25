@@ -5,6 +5,7 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 
+from src.voice_communication import speak
 from src import calc
 from src import converter
 
@@ -84,37 +85,45 @@ def controlling_lights(command):
 	if "kill" in command or "everything off" in command:
 		controlling_lights("off living room")
 		controlling_lights("off bedroom")
-		return "copy that"
+		speak("copy that")
+		return
 	elif "going to bed" in command:
 		controlling_lights("off living room")
 		controlling_lights("set bedroom to 50")
 		time.sleep(5 * 60) # 5 min
 		controlling_lights("off bedroom")
-		return "copy that"
+		speak("copy that")
+		return
 	elif "room" in command:
 		room_number = get_rooms_no(command)
 		if room_number is None:
-			return "the room doesn't exist"
+			speak("the room doesn't exist")
+			return
 		url = f"{rest_api}groups/{room_number}/action"
 	else:
 		number = deff_single_source(command)
 		if number is None:
-			return "Not a valid source"
+			speak("Not a valid source")
+			return
 		url = f"{rest_api}lights/{number}/state"
 
 	# get the status from the giving sorce
 	if "status" in command:
 		light_level = get_status(url)
 		if light_level is None:
-			return "No info was found"
-		return f"The light level is set to: {light_level}%"
+			speak("No info was found")
+			return
+		speak(f"The light level is set to: {light_level}%")
+		return
 
 	body = create_body(command)
 	if isinstance(body, str) or body is None:
 		if body is not None:
-			return body
+			speak(body)
+			return
 		else:
-			return "invalid execution"
+			speak("invalid execution")
+			return
 
 	try:
 		r = requests.put(url, json.dumps(body), timeout=5)
@@ -122,5 +131,6 @@ def controlling_lights(command):
 		print("PUT error. Try again later")
 	response = r.json()
 	if isinstance(response, list) and "success" in response[0]:
-		return ""
-	return "an error acure"
+		return
+	speak("an error acure")
+	return

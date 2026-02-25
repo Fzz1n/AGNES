@@ -1,45 +1,15 @@
 import os
 import time
 import threading
-import playsound
-from gtts import gTTS
 import speech_recognition as sr
 
+from src.voice_communication import speak, get_audio
+import src.global_var
 from src import sound_effects
 from src import calc
 from src import converter
 from src import timer
 from src.IoT import light
-
-misunderstanding_counter = 0
-
-def speak(text):
-    tts = gTTS(text=text, lang="en")
-    filename = "voice.mp3"
-    tts.save(filename)
-    playsound.playsound(filename)
-    os.remove("voice.mp3")
-
-def get_audio(r, source, lang):
-    global misunderstanding_counter
-    while True:
-        try:
-            audio = r.listen(source, phrase_time_limit=8)
-            said = r.recognize_google(audio, language=lang) # Danish -> da-DK || English(US) -> en-US
-            print("You said:", said.lower())
-            return said.lower()
-
-        except sr.WaitTimeoutError:
-            print("Ingen lyd registreret")
-            continue
-        
-        except sr.UnknownValueError:
-            misunderstanding_counter += 1
-            print("Couldn't understand audio")
-            continue
-        
-        except sr.RequestError as e:
-            print("Google API fejl:", e)
 
 def main():
     global misunderstanding_counter
@@ -91,10 +61,14 @@ def main():
             elif "what" in text:
                 if "time" in text:
                     speak(timer.current_time())
-                elif "todays date" in text:
+                elif "today's date" in text:
                     speak(timer.todays_date())
                 elif "day is it today" in text:
-                    speak(timer.todays_weekday_name())
+                    day = timer.todays_weekday_name()
+                    if day == "Wednesday":
+                        sound_effects.play_mp3("it_is_wednesday")
+                    else:
+                        speak(day)
                 elif "month" in text:
                     speak(timer.current_month_name())
                 elif "week" in text:
@@ -105,19 +79,20 @@ def main():
                 elif "game" in text:
                     sound_effects.play_mp3("game_on")
             elif "adjust" in text:
-                if "sound" in text:
+                if "audio" in text or "sound" in text:
                     sound_effects.adjust_sound(converter.get_number(text))
-            elif "light" in text or "ture" in text or "going to bed" in text:
-                light.controlling_lights(text)
             elif "misunderstanding counter" in text:
                 if "reset" in text:
-                    misunderstanding_counter = 0
-                    speak("counter is not set to: 0")
+                    src.global_var.misunderstanding_counter = 0
+                    speak("counter is now reset")
                 else:
-                    speak(f"The counter is now: {misunderstanding_counter}")
+                    speak(f"The counter is now: {src.global_var.misunderstanding_counter}")
+            elif "light" in text or "turn" in text or "set" in text or "going to bed" in text:
+                t = threading.Thread(target=light.controlling_lights, args=(text,))
+                t.start()
             elif "joke" in text:
-                speak("what do you call a cow without legs.")
-                time.sleep(5)
+                speak("what do you call a cow without legs")
+                time.sleep(2)
                 speak("ground beef")
             elif "exit" in text:
                 print("Exiting program...")
