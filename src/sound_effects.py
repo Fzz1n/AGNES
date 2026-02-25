@@ -1,4 +1,3 @@
-import os
 import platform
 import subprocess
 
@@ -30,4 +29,5 @@ def play_mp3(soundname):
         subprocess.run(["mpg123", "-q", filename])
 
     elif system == "Windows":
-        os.startfile(filename)
+        import playsound
+        playsound.playsound(filename)

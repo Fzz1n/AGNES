@@ -16,7 +16,8 @@ def speak(text):
     if system == "Linux":
         subprocess.run(["mpg123", "-q", filename])
     elif system == "Windows":
-        os.startfile(filename)
+        import playsound
+        playsound.playsound(filename)
 
     os.remove(filename)
 
