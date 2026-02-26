@@ -1,25 +1,20 @@
 import platform
 import subprocess
 
-def adjust_sound(value):
-    if not 0 <= value <= 100:
+def adjust_sound(volume):
+    if not 0 <= volume <= 100:
         return "Not a valid input"
 
     system = platform.system()
 
     if system == "Windows":
         import pyvolume
-        pyvolume.custom(percent=value)
+        pyvolume.custom(percent=volume)
 
     elif system == "Linux":
-        subprocess.run(
-            ["amixer", "set", "Master", f"{value}%"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        subprocess.run(["amixer", "-c", "2", "set", "PCM", f"{volume}%"]) # Replace with yours speaker
 
-    return f"The volume is set to {value}"
-
+    return f"The volume is set to {volume}"
 
 def play_mp3(soundname):
     filename = f"src/mp3_files/{soundname}.mp3"
