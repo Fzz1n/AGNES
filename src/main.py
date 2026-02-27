@@ -56,7 +56,7 @@ def main():
                 if "stop" in text:
                     src.global_var.stop_event.set()
                 else:
-                    if not src.global_var.stop_event.is_set():
+                    if src.global_var.stop_event.is_set():
                         src.global_var.stop_event.clear()
                     t = threading.Thread(target=timer.start_timer, args=(text,))
                     t.start()
