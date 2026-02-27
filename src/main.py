@@ -53,7 +53,7 @@ def main():
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "timer" in text:
-                if "stop" in text:
+                if "stop" in text or "reset" in text:
                     src.global_var.stop_event.set()
                 else:
                     if src.global_var.stop_event.is_set():
