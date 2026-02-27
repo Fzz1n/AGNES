@@ -133,7 +133,7 @@ def lookup_weather(text):
     weather_by_day = {item["day"]: item for item in weather_data}
 
     if "tomorrow" in text:
-        tomorrow = timer.todays_weekday_name(1)
+        tomorrow = timer.todays_weekday_name(1).lower()
         return weather_forcast(weather_by_day[tomorrow], "tomorrow")
     else:
         for week_day in src.global_var.weeks_day_name:
