@@ -59,7 +59,10 @@ def main():
             elif "weather" in text:
                 speak(weather.lookup_weather(text))
             elif "calculate" in text or "what is" in text:
-                num1, num2 = converter.get_multiple_numbers(text)
+                numbers = converter.get_two_numbers(text)
+                if numbers is None:
+                    speak("Missing one or two numbers")
+                num1, num2 = numbers
                 result = None
                 if "+" in text or "plus" in text:
                     result = calc.addition(num1, num2)
