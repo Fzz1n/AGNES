@@ -53,9 +53,12 @@ def main():
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "timer" in text:
+                stop_event = src.global_var.stop_event
                 if "stop" in text:
-                    src.global_var.stop_event.set()
+                    stop_event.set()
                 else:
+                    if not stop_event.is_set():
+                        stop_event.clear()
                     t = threading.Thread(target=timer.start_timer, args=(text,))
                     t.start()
             elif "weather" in text:
