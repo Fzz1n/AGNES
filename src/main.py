@@ -58,6 +58,23 @@ def main():
                 t.start()
             elif "weather" in text:
                 speak(weather.lookup_weather(text))
+            elif "calculate" in text or "what is" in text:
+                num1, num2 = converter.get_multiple_numbers(text)
+                result = None
+                if "+" in text or "plus" in text:
+                    result = calc.addition(num1, num2)
+                elif "-" in text or "minus" in text:
+                    result = calc.subtraction(num1, num2)
+                elif "x" in text or "times" in text:
+                    result = calc.multiplication(num1, num2)
+                elif "/" in text or "divided" in text:
+                    result = calc.division(num1, num2)
+                elif "difference" in text:
+                    result = calc.ingers_equation(num1, num2)
+                    if result != round(result):
+                        result = f"approximately {round(result,1)}"
+                    result = f"{result}%"
+                speak(result)
             elif "rice" in text:
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
             elif "what" in text:

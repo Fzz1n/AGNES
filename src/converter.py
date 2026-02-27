@@ -25,6 +25,16 @@ def get_number(text):
             break
     return num
 
+def get_multiple_numbers(text):
+    text = text.replace("%", "")
+    array = text.split(" ")
+    arr = []
+    for item in array:
+        res = string_to_float(item)
+        if res != "":
+            arr.append(res)
+    return arr
+
 def get_number_and_unit(text):
     text_array = text.split(" ")
     res_array = []
