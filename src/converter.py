@@ -35,7 +35,6 @@ def get_two_numbers(text):
         if res != "":
             counter += 1
             arr.append(res)
-    print(counter)
     if counter == 2:
         return arr
     return
