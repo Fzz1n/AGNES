@@ -37,7 +37,7 @@ def main():
             elif "energy threshold" in text:
                 if "change" in text:
                     number = converter.get_number(text)
-                    if not 50 <= number <= 1000:
+                    if not 50 <= number <= 800:
                         speak("Not a valid input")
                     else:
                         r.energy_threshold = number
