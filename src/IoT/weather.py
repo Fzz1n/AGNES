@@ -63,7 +63,7 @@ def get_weather_data(lat, lon):
         end = start + 24
 
         day_data = {
-            "day": timer.todays_weekday_name(d),
+            "day": timer.todays_weekday_name(d).lower(),
             "min_temp": min(hourly_apparent_temperature[start:end]),
             "max_temp": max(hourly_apparent_temperature[start:end]),
             "max_wind": max(hourly_wind_speed_10m[start:end]),
