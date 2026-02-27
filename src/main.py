@@ -70,7 +70,6 @@ def main():
                     elif "-" in text or "minus" in text:
                         result = calc.subtraction(num1, num2)
                     elif "x" in text or "times" in text:
-                        print("times")
                         result = calc.multiplication(num1, num2)
                     elif "/" in text or "divided" in text:
                         result = calc.division(num1, num2)
