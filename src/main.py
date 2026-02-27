@@ -69,21 +69,37 @@ def main():
                 else:
                     num1, num2 = numbers
                     result = None
-                    if "+" in text or "plus" in text:
+                    
+                    # Determine operation
+                    if "difference" in text:
+                        result = calc.ingers_equation(num1, num2)
+                        is_percent = True
+                    elif "+" in text or "plus" in text:
                         result = calc.addition(num1, num2)
+                        is_percent = False
                     elif "-" in text or "minus" in text:
                         result = calc.subtraction(num1, num2)
+                        is_percent = False
                     elif "x" in text or "times" in text:
                         result = calc.multiplication(num1, num2)
+                        is_percent = False
                     elif "/" in text or "divided" in text:
-                        result = calc.division(num1, num2)
-                    elif "difference" in text:
-                        result = calc.ingers_equation(num1, num2)
-                        if result != round(result):
-                            result = f"approximately {round(result,1)}"
-                        result = f"{result}%"
+                        try:
+                            result = calc.division(num1, num2)
+                        except ZeroDivisionError:
+                            speak("Cannot divide by zero")
+                            result = None
+                        is_percent = False
+
+                    # Format result
                     if result is not None:
-                        speak(f"{result}")
+                        if result != round(result):
+                            result_str = f"approximately {round(result,1)}"
+                        else:
+                            result_str = str(int(result))
+                        if is_percent:
+                            result_str += "%"
+                        speak(result_str)
             elif "rice" in text:
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
             elif "what" in text:
