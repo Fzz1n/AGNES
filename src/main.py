@@ -12,7 +12,6 @@ from src import timer
 from src.IoT import light, weather
 
 def main():
-    global misunderstanding_counter
     r = sr.Recognizer()
     r.dynamic_energy_threshold = False
     r.energy_threshold = 200
@@ -54,8 +53,11 @@ def main():
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "timer" in text:
-                t = threading.Thread(target=timer.start_timer, args=(text,))
-                t.start()
+                if "stop" in text:
+                    src.global_var.stop_event.set()
+                else:
+                    t = threading.Thread(target=timer.start_timer, args=(text,))
+                    t.start()
             elif "weather" in text:
                 speak(weather.lookup_weather(text))
             elif "calculate" in text or "what is" in text:
