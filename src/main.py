@@ -9,7 +9,7 @@ from src import sound_effects
 from src import calc
 from src import converter
 from src import timer
-from src.IoT import light
+from src.IoT import light, weather
 
 def main():
     global misunderstanding_counter
@@ -56,6 +56,8 @@ def main():
             elif "timer" in text:
                 t = threading.Thread(target=timer.start_timer, args=(text,))
                 t.start()
+            elif "weather" in text:
+                speak(weather.lookup_weather(text))
             elif "rice" in text:
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
             elif "what" in text:

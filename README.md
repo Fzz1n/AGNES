@@ -99,6 +99,9 @@ git switch -c bugfix/bug-name
 
 3. Commit your changes:
 ```bash
+# New packages
+pip freeze > requirements.txt
+
 git commit
 # Write commit message in opened editor, save and exit editor
 ```

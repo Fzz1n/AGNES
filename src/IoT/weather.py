@@ -114,8 +114,8 @@ def weather_station():
     return weather_data 
 
 def weather_forcast(item, when):
-    max_t = item["min_temp"]
-    min_t = item["max_temp"]
+    min_t = item["min_temp"]
+    max_t = item["max_temp"]
     wind = item["max_wind"]
     prec = item["total_precipitation"]
     weather_projection = f"{when} the temperature will range between {round(min_t)} and {round(max_t)} °C, with wind speeds of {round(wind)} m/s"
@@ -141,6 +141,3 @@ def lookup_weather(text):
                 return weather_forcast(weather_by_day[week_day], week_day)
                 
     return "Couldn't find any weather projection"
-            
-print(lookup_weather("tomorrow"))
-print(lookup_weather("random sætnign Monday"))
