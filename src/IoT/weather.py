@@ -109,7 +109,7 @@ def weather_station():
         src.global_var.weather_data = weather_data
         src.global_var.weather_data_age = timer.current_time_sec()
     else:
-        print("Using old data")
+        print("Using old data wather data")
         
     return weather_data 
 
