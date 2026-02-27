@@ -77,7 +77,7 @@ def main():
                     if result != round(result):
                         result = f"approximately {round(result,1)}"
                     result = f"{result}%"
-                speak(result)
+                speak(f"{result}")
             elif "rice" in text:
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
             elif "what" in text:
