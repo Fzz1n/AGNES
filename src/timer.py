@@ -7,14 +7,13 @@ from src import sound_effects
 from src import converter
 
 def countdown(t):
-    stop_event = src.global_var.stop_event
-    while t and not stop_event.is_set():
+    while t and not src.global_var.stop_event.is_set():
         mins, secs = divmod(t, 60)
         timer = '{:02d}:{:02d}'.format(mins, secs)
         print(timer, end='\r')  # Overwrite the line each second
         time.sleep(1)
         t -= 1
-    if not stop_event.is_set():
+    if not src.global_var.stop_event.is_set():
         sound_effects.play_mp3("alarms/classic_alarm")
     else:
         print("Alarm stoped")
