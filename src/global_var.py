@@ -3,3 +3,4 @@ weeks_day_name = ["monday", "tuesday", "wednesday", "thursday", "friday", "satur
 coordinates = None
 weather_data = None
 weather_data_age = None
+last_answer = "No previous response"

@@ -7,6 +7,7 @@ import speech_recognition as sr
 import src.global_var
 
 def speak(text):
+    src.global_var.last_answer = text # Saving the answer
     tts = gTTS(text=text, lang="en")
     filename = "voice.mp3"
     tts.save(filename)

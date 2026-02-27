@@ -118,6 +118,8 @@ def main():
                 speak("what do you call a cow without legs")
                 time.sleep(2)
                 speak("ground beef")
+            elif "please repeat" in text or "please repeat" in text or "sorry" in text:
+                speak(src.global_var.last_answer)
             elif "exit" in text:
                 print("Exiting program...")
                 break
