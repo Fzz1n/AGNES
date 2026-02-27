@@ -1,4 +1,5 @@
 import time
+import datetime
 
 from src import sound_effects
 from src import converter
@@ -15,6 +16,10 @@ def start_timer(text):
     countdown(converter.get_time(text))
     sound_effects.play_mp3("alarms/classic_alarm")
 
+# Get now time in sec
+def current_time_sec():
+    return time.time()
+
 # Get current time
 def current_time():
     return time.strftime("%X")
@@ -24,8 +29,8 @@ def todays_date():
     return time.strftime("%x")
 
 # Get todays weekday name
-def todays_weekday_name():
-    return time.strftime("%A")
+def todays_weekday_name(days_ahead = 0):
+    return (datetime.date.today() + datetime.timedelta(days=days_ahead)).strftime('%A')
 
 # Get current month
 def current_month_name():
@@ -34,3 +39,13 @@ def current_month_name():
 # Get this week number
 def current_week_number():
     return time.strftime("%V")
+
+# Compare old current time in sec
+def older_than_7_days(start_time):
+    if start_time is None:
+        return True
+    diff_sec = current_time_sec() - start_time
+    diff_days = diff_sec / (60 * 60 * 24)
+    
+    # Max 7 days old
+    return diff_days > 7
