@@ -37,8 +37,11 @@ def main():
             elif "energy threshold" in text:
                 if "change" in text:
                     number = converter.get_number(text)
-                    r.energy_threshold = number
-                    speak(f"energy threshold is now changed to: {number}")
+                    if not 50 <= number <= 1000:
+                        speak("Not a valid input")
+                    else:
+                        r.energy_threshold = number
+                        speak(f"energy threshold is now changed to: {number}")
                 elif "reading" in text:
                     speak(f"{round(r.energy_threshold, 2)}")
                 elif "deactivate dynamic" in text:
