@@ -15,8 +15,6 @@ def countdown(t):
         t -= 1
     if not src.global_var.stop_event.is_set():
         sound_effects.play_mp3("alarms/classic_alarm")
-    else:
-        print("Alarm stoped")
 
 def start_timer(text):
     countdown(converter.get_time(text))
