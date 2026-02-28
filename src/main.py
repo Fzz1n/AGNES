@@ -60,7 +60,7 @@ def main():
             elif "timer" in text:
                 if "stop" in text or "reset" in text:
                     src.global_var.stop_event.set()
-                    speak("Times stopped")
+                    speak("Time stopped")
                 else:
                     if src.global_var.stop_event.is_set():
                         src.global_var.stop_event.clear()
