@@ -53,6 +53,8 @@ def main():
                     speak("dynamic energy threshold is now activated")
             elif "deactivate microphone" in text:
                 speak("copy that")
+                if src.global_var.stop_event.is_set():
+                    src.global_var.stop_event.clear()
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "timer" in text:
