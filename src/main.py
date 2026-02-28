@@ -61,6 +61,7 @@ def main():
                 else:
                     if src.global_var.stop_event.is_set():
                         src.global_var.stop_event.clear()
+                    speak("copy that")
                     t = threading.Thread(target=timer.start_timer, args=(text,))
                     t.start()
             elif "weather" in text:
