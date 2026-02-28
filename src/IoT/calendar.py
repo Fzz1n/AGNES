@@ -1,11 +1,16 @@
 '''
 THE GOAL
-- upcomming next week event,
+(check) - upcomming next week event,
 - cherrypick and check spesafic day
 - create calender event, including (time/date, description, categori)
 '''
 import datetime
+import re
+import time
 import os.path
+import src.global_var
+import src.timer
+from src.voice_communication import speak
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -21,11 +26,9 @@ def authenticate_google():
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
 	creds = None
-	# The file token.json stores the user's access and refresh tokens, and is
-	# created automatically when the authorization flow completes for the first time.
 	if os.path.exists("token.json"):
 		creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-	# If there are no (valid) credentials available, let the user log in.
+
 	if not creds or not creds.valid:
 		if creds and creds.expired and creds.refresh_token:
 			creds.refresh(Request())
@@ -68,41 +71,108 @@ def get_events(cal_id, service, start_day, end_day = None):
 			events_res.extend(result.get("items", []))
 
 		if not events_res:
-			print("No upcoming events found.")
 			return
-		
+
 		# Sort the events based on when they starts
-		events_res.sort(key=lambda x: x["start"].get("dateTime"))
+		events_res.sort(key=lambda x: x["start"].get("dateTime") or x["start"].get("date"))
 		
 		# Convert the ISO 8601 date to normal
 		events_iso_free = []
 		for e in events_res:
-			start = datetime.datetime.fromisoformat(e["start"].get("dateTime"))
-			end = datetime.datetime.fromisoformat(e["end"].get("dateTime"))
-			
-			event = {
-				"title": e["summary"],
-				"event_start": start.date(),
-				"event_end": end.date(),
-				"time_start": start.time(),
-				"time_end": end.time()
-			}
+			start_val = e["start"].get("dateTime") or e["start"].get("date")
+			end_val = e["end"].get("dateTime") or e["end"].get("date")
+
+			if start_val is None or end_val is None:
+				continue 
+
+			start = datetime.datetime.fromisoformat(start_val.replace("Z", "+00:00"))
+			end = datetime.datetime.fromisoformat(end_val.replace("Z", "+00:00"))
+			if "T" in start_val: # event with time
+				event = {
+					"title": e.get("summary", "No title"),
+					"event_start": start.date(),
+					"event_end": end.date(),
+					"time_start": start.time(),
+					"time_end": end.time()
+				}
+			else:  # all-day event
+				event = {
+					"title": e.get("summary", "No title"),
+					"event_start": start.date(),
+					"event_end": end.date(),
+					"time_start": None,
+					"time_end": None
+				}
 
 			events_iso_free.append(event)
 		
-		for event in events_iso_free:
-			print()
-			for key, info in event.items():
-					print(f"{key}: {info}")
-		
+		return events_iso_free
 
 	except HttpError as error:
 		print(f"An error occurred: {error}")
+		return
 
-service = authenticate_google()
-cal_id = diff_calender_id(service)
-start = datetime.date.today()
-end = datetime.date.today() + datetime.timedelta(days=6)
-print("start:", start)
-print("end:", end)
-get_events(cal_id, service, start, end)
+def calendar_output(events):
+	for event in events:
+		event_info = event["event_start"].strftime('%B %d')
+		if event["event_start"] != event["event_end"]:
+			event_info += event["event_end"].strftime('-%d')
+
+		event_info += f": {event['title']}"
+		
+		if  event["time_start"] is not None:
+			start_t = event["time_start"].strftime('%H:%M')
+			end_t = event["time_end"].strftime('%H:%M')
+			event_info += f", {start_t}-{end_t}"
+		
+		speak(event_info)
+
+def lookup_calendar(text):
+	service = authenticate_google()
+	cal_id = diff_calender_id(service)
+	today = datetime.date.today()
+	tomorrow = today + datetime.timedelta(days=1)
+	date_monday = src.timer.next_date_by_weekday(0)
+	date_sunday = date_monday + datetime.timedelta(days=6)
+	
+	events = None
+	if "week" in text:
+		events = get_events(cal_id, service, date_monday, date_sunday)
+
+	elif "today" in text:
+		events = get_events(cal_id, service, today)
+	
+	elif "tomorrow" in text:
+		events = get_events(cal_id, service, tomorrow)
+
+	else:
+		weekday_int = [src.global_var.weeks_day_name_int[week_day] for week_day in src.global_var.weeks_day_name if week_day in text]
+		if len(weekday_int) != 0:
+			date = src.timer.next_date_by_weekday(weekday_int[0])
+			events = get_events(cal_id, service, date)
+		else:
+			month_in_month = [month for month in src.global_var.months if month in text]
+
+			if not len(month_in_month):
+				return "a month is missing"
+			month_num = src.global_var.months[month_in_month[0]]
+			
+			match = re.search(r"\d+", text)
+			if not match:
+				return "a date is missing"
+			
+			first_num = match.group()
+			date = datetime.datetime(int(time.strftime("%Y")), int(month_num), int(first_num))
+			events = get_events(cal_id, service, date.date())
+
+	if events is not None:
+		calendar_output(events)
+		return
+	
+	return "No upcoming events"
+
+array = ["12th", "12th april", "april", "tomorrow"]
+for index in array:
+	calender_calll = lookup_calendar(index)
+	if calender_calll is not None:
+		speak(calender_calll)
