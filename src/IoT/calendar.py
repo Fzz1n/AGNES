@@ -18,7 +18,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
 def authenticate_google():
@@ -44,13 +44,25 @@ def authenticate_google():
 	service = build("calendar", "v3", credentials=creds)
 	return service
 
-def diff_calender_id(service):
+def owner_diff_calender(service):
 	calendar_list = service.calendarList().list().execute()
 	calendars = calendar_list.get("items")
-	cal_id = [cal["id"] for cal in calendars if cal["accessRole"] == "owner"]
-	return cal_id
+	cal_info = []
+	for cal in calendars:
+		if cal["accessRole"] == "owner":
+			if cal["id"] == cal["summary"]:
+				name = "Primary"
+			else:
+				name = cal["summary"]
+			info = {
+				"name": name,
+				"mail": cal["id"],
+				"time_zone": cal["timeZone"]
+			}
+			cal_info.append(info)
+	return cal_info
 
-def get_events(cal_id, service, start_day, end_day = None):
+def get_events(cal_info, service, start_day, end_day = None):
 	if end_day is None:
 		end_day = start_day
 	
@@ -60,9 +72,9 @@ def get_events(cal_id, service, start_day, end_day = None):
 		end_date = datetime.datetime.combine(end_day, datetime.time.max, tzinfo=datetime.timezone.utc).isoformat()
 
 		events_res = []
-		for cal_id_item in cal_id:
+		for cal_info_item in cal_info:
 			result = service.events().list(
-				calendarId=cal_id_item,
+				calendarId=cal_info_item["mail"],
 				timeMin=start_date,
 				timeMax=end_date,
 				singleEvents=True,
@@ -125,11 +137,12 @@ def calendar_output(events):
 			end_t = event["time_end"].strftime('%H:%M')
 			event_info += f", {start_t}-{end_t}"
 		
-		speak(event_info)
+		print(event_info)
+		#speak(event_info)
 
 def lookup_calendar(text):
 	service = authenticate_google()
-	cal_id = diff_calender_id(service)
+	cal_info = owner_diff_calender(service)
 	today = datetime.date.today()
 	tomorrow = today + datetime.timedelta(days=1)
 	date_monday = src.timer.next_date_by_weekday(0)
@@ -137,19 +150,19 @@ def lookup_calendar(text):
 	
 	events = None
 	if "week" in text:
-		events = get_events(cal_id, service, date_monday, date_sunday)
+		events = get_events(cal_info, service, date_monday, date_sunday)
 
 	elif "today" in text:
-		events = get_events(cal_id, service, today)
+		events = get_events(cal_info, service, today)
 	
 	elif "tomorrow" in text:
-		events = get_events(cal_id, service, tomorrow)
+		events = get_events(cal_info, service, tomorrow)
 
 	else:
 		weekday_int = [src.global_var.weeks_day_name_int[week_day] for week_day in src.global_var.weeks_day_name if week_day in text]
 		if len(weekday_int) != 0:
 			date = src.timer.next_date_by_weekday(weekday_int[0])
-			events = get_events(cal_id, service, date)
+			events = get_events(cal_info, service, date)
 		else:
 			month_in_month = [month for month in src.global_var.months if month in text]
 
@@ -163,7 +176,7 @@ def lookup_calendar(text):
 			
 			first_num = match.group()
 			date = datetime.datetime(int(time.strftime("%Y")), int(month_num), int(first_num))
-			events = get_events(cal_id, service, date.date())
+			events = get_events(cal_info, service, date.date())
 
 	if events is not None:
 		calendar_output(events)
@@ -171,8 +184,54 @@ def lookup_calendar(text):
 	
 	return "No upcoming events"
 
-array = ["12th", "12th april", "april", "tomorrow"]
-for index in array:
-	calender_calll = lookup_calendar(index)
-	if calender_calll is not None:
-		speak(calender_calll)
+def add_event(text):
+	service = authenticate_google()
+	all_cal_info = owner_diff_calender(service)
+
+	'''
+	# Extract info from text
+	if "next year" in text:
+		# cal next year
+
+	# Month
+	if not len(month_in_month):
+		return "a month is missing"
+	month_num = src.global_var.months[month_in_month[0]]
+	
+	# Date
+	match = re.search(r"\d+", text)
+	if not match:
+		return "a date is missing"
+	'''
+	primary_cal = all_cal_info[0]
+
+	event = {
+		'summary': text,
+		'start': {
+			'dateTime': '2026-03-03T09:00:00+01:00',
+			'timeZone': primary_cal["time_zone"]
+		},
+		'end': {
+			'dateTime': '2026-03-03T17:00:00+01:00',
+			'timeZone': primary_cal["time_zone"]
+		}
+	}
+
+	event = service.events().insert(calendarId='primary', body=event).execute()
+	print('Event created: %s' % (event.get('htmlLink')))
+
+def test():
+	''' test GET calendar data
+	array = ["tuesday"] # "12th", "12th april", "april"
+	for index in array:
+		calender_calll = lookup_calendar(index)
+		if calender_calll is not None:
+			speak(calender_calll)
+	'''
+	'''
+	service = authenticate_google()
+	cal_info = owner_diff_calender(service)
+	print(cal_info)
+ 	'''
+	add_event("dette er en test2")
+test()
