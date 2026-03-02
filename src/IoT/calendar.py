@@ -6,9 +6,9 @@ THE GOAL
 '''
 import datetime
 import re
-import time
 import os.path
 import src.global_var
+import src.converter
 import src.timer
 from src.voice_communication import speak
 
@@ -164,18 +164,7 @@ def lookup_calendar(text):
 			date = src.timer.next_date_by_weekday(weekday_int[0])
 			events = get_events(cal_info, service, date)
 		else:
-			month_in_month = [month for month in src.global_var.months if month in text]
-
-			if not len(month_in_month):
-				return "a month is missing"
-			month_num = src.global_var.months[month_in_month[0]]
-			
-			match = re.search(r"\d+", text)
-			if not match:
-				return "a date is missing"
-			
-			first_num = match.group()
-			date = datetime.datetime(int(time.strftime("%Y")), int(month_num), int(first_num))
+			date = src.converter.get_date(text)
 			events = get_events(cal_info, service, date.date())
 
 	if events is not None:
@@ -187,35 +176,58 @@ def lookup_calendar(text):
 def add_event(text):
 	service = authenticate_google()
 	all_cal_info = owner_diff_calender(service)
-
-	'''
-	# Extract info from text
-	if "next year" in text:
-		# cal next year
-
-	# Month
-	if not len(month_in_month):
-		return "a month is missing"
-	month_num = src.global_var.months[month_in_month[0]]
 	
-	# Date
-	match = re.search(r"\d+", text)
-	if not match:
-		return "a date is missing"
-	'''
-	primary_cal = all_cal_info[0]
+	# Get the date
+	date = src.converter.get_date(text)
+	if isinstance(date, str):
+		return date
 
-	event = {
-		'summary': text,
-		'start': {
-			'dateTime': '2026-03-03T09:00:00+01:00',
-			'timeZone': primary_cal["time_zone"]
-		},
-		'end': {
-			'dateTime': '2026-03-03T17:00:00+01:00',
-			'timeZone': primary_cal["time_zone"]
+	# Extract the title from text
+	month = date.strftime('%B').lower()
+	match = re.search(rf"calendar (.*?) {month}", text)
+	if not match:
+		return "Missing a title."
+	title = match.group(1)
+
+	# Extract the time from text
+	clock = src.converter.get_clock(text)
+
+	if clock is not None:
+		start_time = datetime.datetime.strptime(clock[0] + ":00", '%H:%M:%S').time()
+		end_time = datetime.datetime.strptime(clock[1] + ":00", '%H:%M:%S').time()
+
+		start = datetime.datetime.combine(date, start_time).isoformat()
+		end = datetime.datetime.combine(date, end_time).isoformat()
+
+		primary_cal = all_cal_info[0]
+
+		event = {
+			'summary': title,
+			'start': {
+				'dateTime': start,
+				'timeZone': primary_cal["time_zone"]
+			},
+			'end': {
+				'dateTime': end,
+				'timeZone': primary_cal["time_zone"]
+			}
 		}
-	}
+
+	else:
+		start_time = datetime.datetime.combine(date).isoformat()
+		end_time = datetime.datetime.combine(date).isoformat()
+		
+		event = {
+			'summary': title,
+			'start': {
+				'date': start_time,
+				'timeZone': primary_cal["time_zone"]
+			},
+			'end': {
+				'date': start_time,
+				'timeZone': primary_cal["time_zone"]
+			}
+		}
 
 	event = service.events().insert(calendarId='primary', body=event).execute()
 	print('Event created: %s' % (event.get('htmlLink')))
@@ -232,6 +244,12 @@ def test():
 	service = authenticate_google()
 	cal_info = owner_diff_calender(service)
 	print(cal_info)
- 	'''
-	add_event("dette er en test2")
+	'''
+	month = "march"
+	date = "4"
+	title = "test python mail"
+	start_time= "18:30"
+	end_time= "19:30"
+	add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	
 test()

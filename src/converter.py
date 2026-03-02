@@ -1,3 +1,9 @@
+import datetime
+import time
+import re
+
+import src.global_var
+
 def string_to_int(s):
     try:
         num = int(s)
@@ -57,3 +63,32 @@ def get_time(text):
     elif "minutes" in text:
         return number * 60
     return number
+
+def get_date(text):
+    month_in_month = [month for month in src.global_var.months if month in text]
+
+    # Date
+    match = re.search(r"\d+", text)
+    if not match:
+        return "a date is missing"
+    first_num = match.group()
+    
+    # Month
+    if not len(month_in_month):
+        return "a month is missing"
+    month_num = src.global_var.months[month_in_month[0]]
+
+    # Year
+    year = datetime.date.today().year
+    if "next year" in text:
+        year += 1
+
+    date = datetime.datetime(int(year), int(month_num), int(first_num))
+    return date
+
+def get_clock(text):
+    match = re.findall(r"\d*:\d+", text)
+    if match:
+        return match
+    print("No time found.")
+    return
