@@ -68,14 +68,14 @@ def get_date(text):
     month_in_month = [month for month in src.global_var.months if month in text]
 
     # Date
-    match = re.search(r"\d+", text)
+    match = re.search(r"(?<!:)\b\d+\b(?!:)", text)
     if not match:
-        return "a date is missing"
+        return "A date is missing."
     first_num = match.group()
     
     # Month
     if not len(month_in_month):
-        return "a month is missing"
+        return "A month is missing."
     month_num = src.global_var.months[month_in_month[0]]
 
     # Year

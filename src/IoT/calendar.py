@@ -1,9 +1,3 @@
-'''
-THE GOAL
-(check) - upcomming next week event,
-- cherrypick and check spesafic day
-- create calender event, including (time/date, description, categori)
-'''
 import datetime
 import re
 import os.path
@@ -55,7 +49,7 @@ def owner_diff_calender(service):
 			else:
 				name = cal["summary"]
 			info = {
-				"name": name,
+				"name": name.lower(),
 				"mail": cal["id"],
 				"time_zone": cal["timeZone"]
 			}
@@ -176,65 +170,76 @@ def lookup_calendar(text):
 def add_event(text):
 	service = authenticate_google()
 	all_cal_info = owner_diff_calender(service)
-	
+
 	# Get the date
 	date = src.converter.get_date(text)
 	if isinstance(date, str):
 		return date
 
-	# Extract the title from text
+	# Title from text
 	month = date.strftime('%B').lower()
 	match = re.search(rf"calendar (.*?) {month}", text)
 	if not match:
 		return "Missing a title."
 	title = match.group(1)
 
-	# Extract the time from text
+	# Target calendar
+	match = re.search(r"(\w+)\s+calendar", text)
+	if not match:
+		print("Missing calender")
+	target = match.group(1)
+
+	calendar_id = next(
+		(cal_id["mail"] for cal_id in all_cal_info if target in cal_id["name"]),
+		"primary"
+	)
+
+	# Time from text
 	clock = src.converter.get_clock(text)
 
 	if clock is not None:
 		start_time = datetime.datetime.strptime(clock[0] + ":00", '%H:%M:%S').time()
-		end_time = datetime.datetime.strptime(clock[1] + ":00", '%H:%M:%S').time()
+		if len(clock) == 1:
+			end_time = datetime.time.max
+		else:
+			end_time = datetime.datetime.strptime(clock[1] + ":00", '%H:%M:%S').time()
 
 		start = datetime.datetime.combine(date, start_time).isoformat()
 		end = datetime.datetime.combine(date, end_time).isoformat()
-
-		primary_cal = all_cal_info[0]
 
 		event = {
 			'summary': title,
 			'start': {
 				'dateTime': start,
-				'timeZone': primary_cal["time_zone"]
+				'timeZone': all_cal_info[0]["time_zone"]
 			},
 			'end': {
 				'dateTime': end,
-				'timeZone': primary_cal["time_zone"]
+				'timeZone': all_cal_info[0]["time_zone"]
 			}
 		}
 
 	else:
-		start_time = datetime.datetime.combine(date).isoformat()
-		end_time = datetime.datetime.combine(date).isoformat()
+		# Full-day event
+		start = date.date()
+		end = start + datetime.timedelta(days=1)
 		
 		event = {
 			'summary': title,
 			'start': {
-				'date': start_time,
-				'timeZone': primary_cal["time_zone"]
+				'date': str(start)
 			},
 			'end': {
-				'date': start_time,
-				'timeZone': primary_cal["time_zone"]
+				'date': str(end)
 			}
 		}
 
-	event = service.events().insert(calendarId='primary', body=event).execute()
+	event = service.events().insert(calendarId=calendar_id, body=event).execute()
 	print('Event created: %s' % (event.get('htmlLink')))
 
 def test():
 	''' test GET calendar data
-	array = ["tuesday"] # "12th", "12th april", "april"
+	array = ["tuesday", "12th", "12th april", "april",]
 	for index in array:
 		calender_calll = lookup_calendar(index)
 		if calender_calll is not None:
@@ -250,6 +255,8 @@ def test():
 	title = "test python mail"
 	start_time= "18:30"
 	end_time= "19:30"
-	add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	
+	ad = add_event(f"add to money calendar {title} {month} {date}")
+	print(ad)
+
+	# test for adding event across multibel days
 test()
