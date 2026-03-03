@@ -67,24 +67,40 @@ def get_time(text):
 def get_date(text):
     month_in_month = [month for month in src.global_var.months if month in text]
 
-    # Date
-    match = re.search(r"(?<!:)\b\d+\b(?!:)", text)
-    if not match:
-        return "A date is missing."
-    first_num = match.group()
+    # Year
+    year = datetime.date.today().year
+    if "next year" in text:
+        year += 1
     
     # Month
     if not len(month_in_month):
         return "A month is missing."
     month_num = src.global_var.months[month_in_month[0]]
 
-    # Year
-    year = datetime.date.today().year
-    if "next year" in text:
-        year += 1
+    # Date
+    match = re.findall(r"(?<!:)\w\d+(?!:)", text)
+    if not match:
+        return "A date is missing."
 
-    date = datetime.datetime(int(year), int(month_num), int(first_num))
-    return date
+    first_num = match[0]
+    first_date = datetime.datetime(int(year), int(month_num), int(first_num)).date()
+    
+    if len(match) == 2:
+        sec_num = match[1]
+        # Check if the sec_num is smaller, when set the sec_num in next month 
+        if int(first_num) > int(sec_num):
+            # End of the year? Switch month and year
+            if month_num == src.global_var.months["december"]:
+                year += 1
+                month_num = 1
+            else:
+                month_num += 1
+
+        sec_date = datetime.datetime(int(year), int(month_num), int(sec_num)).date()
+
+        return [first_date, sec_date]
+    
+    return first_date
 
 def get_clock(text):
     match = re.findall(r"\d*:\d+", text)

@@ -45,7 +45,7 @@ def current_month_name():
 def current_week_number():
     return time.strftime("%V")
 
-# Get teh next date based on a week day name
+# Get the next date based on a week day name
 def next_date_by_weekday(target_weekday: int):
     today = datetime.date.today()
     today_weekday = today.weekday()  # 0=Mon, 6=Sun

@@ -116,6 +116,7 @@ def get_events(cal_info, service, start_day, end_day = None):
 
 	except HttpError as error:
 		print(f"An error occurred: {error}")
+		speak("An error occurred")
 		return
 
 def calendar_output(events):
@@ -131,8 +132,8 @@ def calendar_output(events):
 			end_t = event["time_end"].strftime('%H:%M')
 			event_info += f", {start_t}-{end_t}"
 		
-		print(event_info)
-		#speak(event_info)
+		#print(event_info)
+		speak(event_info)
 
 def lookup_calendar(text):
 	service = authenticate_google()
@@ -158,8 +159,21 @@ def lookup_calendar(text):
 			date = src.timer.next_date_by_weekday(weekday_int[0])
 			events = get_events(cal_info, service, date)
 		else:
+			start_date = None
+			end_date = None
 			date = src.converter.get_date(text)
-			events = get_events(cal_info, service, date.date())
+			if isinstance(date, str):
+				return date
+			elif isinstance(date, list):
+				start_date = date[0]
+				end_date = date[1]
+			else:
+				start_date = date
+			
+			if end_date is None:
+				end_date = start_date
+			
+			events = get_events(cal_info, service, start_date, end_date)
 
 	if events is not None:
 		calendar_output(events)
@@ -170,14 +184,24 @@ def lookup_calendar(text):
 def add_event(text):
 	service = authenticate_google()
 	all_cal_info = owner_diff_calender(service)
+	start_date = None
+	end_date = None
 
 	# Get the date
 	date = src.converter.get_date(text)
 	if isinstance(date, str):
 		return date
+	elif isinstance(date, list):
+		start_date = date[0]
+		end_date = date[1]
+	else:
+		start_date = date
+	
+	if end_date is None:
+		end_date = start_date
 
 	# Title from text
-	month = date.strftime('%B').lower()
+	month = start_date.strftime('%B').lower()
 	match = re.search(rf"calendar (.*?) {month}", text)
 	if not match:
 		return "Missing a title."
@@ -187,6 +211,7 @@ def add_event(text):
 	match = re.search(r"(\w+)\s+calendar", text)
 	if not match:
 		print("Missing calender")
+		speak("Missing calender")
 	target = match.group(1)
 
 	calendar_id = next(
@@ -204,8 +229,8 @@ def add_event(text):
 		else:
 			end_time = datetime.datetime.strptime(clock[1] + ":00", '%H:%M:%S').time()
 
-		start = datetime.datetime.combine(date, start_time).isoformat()
-		end = datetime.datetime.combine(date, end_time).isoformat()
+		start = datetime.datetime.combine(start_date, start_time).isoformat()
+		end = datetime.datetime.combine(end_date, end_time).isoformat()
 
 		event = {
 			'summary': title,
@@ -221,8 +246,8 @@ def add_event(text):
 
 	else:
 		# Full-day event
-		start = date.date()
-		end = start + datetime.timedelta(days=1)
+		start = start_date
+		end = end_date + datetime.timedelta(days=1)
 		
 		event = {
 			'summary': title,
@@ -235,28 +260,37 @@ def add_event(text):
 		}
 
 	event = service.events().insert(calendarId=calendar_id, body=event).execute()
-	print('Event created: %s' % (event.get('htmlLink')))
+	#print('Event created: %s' % (event.get('htmlLink')))
+	speak("Event created")
 
+'''
 def test():
-	''' test GET calendar data
-	array = ["tuesday", "12th", "12th april", "april",]
+	month = "march"
+	date = "4"
+	title = "test python cal"
+	start_time= "18:30"
+	end_time= "19:30"
+	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	print(ad)
+	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time}")
+	ad = add_event(f"add to my calendar {title} {month} {date}")
+	ad = add_event(f"add to my calendar {month} {date}")
+	ad = add_event(f"add to my calendar {title} {date}")
+	ad = add_event(f"add to my calendar {title} {month} at {start_time}")
+	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	print(ad)
+	date = "4 to 5"
+	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	print(ad)
+	date = "20 to 4"
+	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	# test GET calendar data
+	array = ["wednesday", "12th", "12th april", "april 12th", "april", "april 12"]
 	for index in array:
 		calender_calll = lookup_calendar(index)
 		if calender_calll is not None:
-			speak(calender_calll)
-	'''
-	'''
-	service = authenticate_google()
-	cal_info = owner_diff_calender(service)
-	print(cal_info)
-	'''
-	month = "march"
-	date = "4"
-	title = "test python mail"
-	start_time= "18:30"
-	end_time= "19:30"
-	ad = add_event(f"add to money calendar {title} {month} {date}")
-	print(ad)
+			print(calender_calll)
 
 	# test for adding event across multibel days
 test()
+'''
