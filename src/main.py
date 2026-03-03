@@ -124,7 +124,7 @@ def main():
                     if cal_res is not None:
                         speak(cal_res)
                 else:
-                    calendar.lookup_calendar(text)
+                    calendar.lookup_event(text)
             elif "joke" in text:
                 speak("what do you call a cow without legs")
                 time.sleep(2)

@@ -14,11 +14,8 @@ from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-
+# Authenticate with google and auto creat a token.json
 def authenticate_google():
-	"""Shows basic usage of the Google Calendar API.
-	Prints the start and name of the next 10 events on the user's calendar.
-	"""
 	creds = None
 	if os.path.exists("token.json"):
 		creds = Credentials.from_authorized_user_file("token.json", SCOPES)
@@ -38,6 +35,7 @@ def authenticate_google():
 	service = build("calendar", "v3", credentials=creds)
 	return service
 
+# Finds the diff. calendars/groups owned by the main calendar
 def owner_diff_calender(service):
 	calendar_list = service.calendarList().list().execute()
 	calendars = calendar_list.get("items")
@@ -56,6 +54,7 @@ def owner_diff_calender(service):
 			cal_info.append(info)
 	return cal_info
 
+# Getting events basen on a target date
 def get_events(cal_info, service, start_day, end_day = None):
 	if end_day is None:
 		end_day = start_day
@@ -93,7 +92,7 @@ def get_events(cal_info, service, start_day, end_day = None):
 
 			start = datetime.datetime.fromisoformat(start_val.replace("Z", "+00:00"))
 			end = datetime.datetime.fromisoformat(end_val.replace("Z", "+00:00"))
-			if "T" in start_val: # event with time
+			if "T" in start_val: # Event with time
 				event = {
 					"title": e.get("summary", "No title"),
 					"event_start": start.date(),
@@ -101,7 +100,7 @@ def get_events(cal_info, service, start_day, end_day = None):
 					"time_start": start.time(),
 					"time_end": end.time()
 				}
-			else:  # all-day event
+			else:  # Full-day event
 				event = {
 					"title": e.get("summary", "No title"),
 					"event_start": start.date(),
@@ -119,6 +118,7 @@ def get_events(cal_info, service, start_day, end_day = None):
 		speak("An error occurred")
 		return
 
+# Formate the return from the google calender
 def calendar_output(events):
 	for event in events:
 		event_info = event["event_start"].strftime('%B %d')
@@ -135,7 +135,8 @@ def calendar_output(events):
 		#print(event_info)
 		speak(event_info)
 
-def lookup_calendar(text):
+# 
+def lookup_event(text):
 	service = authenticate_google()
 	cal_info = owner_diff_calender(service)
 	today = datetime.date.today()
@@ -144,6 +145,7 @@ def lookup_calendar(text):
 	date_sunday = date_monday + datetime.timedelta(days=6)
 	
 	events = None
+	# Depending on tehe input it getting data from eather: a week, today, tomorrow, upcoming mon- to sunday, or a inputted date
 	if "week" in text:
 		events = get_events(cal_info, service, date_monday, date_sunday)
 
@@ -156,31 +158,39 @@ def lookup_calendar(text):
 	else:
 		weekday_int = [src.global_var.weeks_day_name_int[week_day] for week_day in src.global_var.weeks_day_name if week_day in text]
 		if len(weekday_int) != 0:
+			# Searches for the next upcoming monday - sunday
 			date = src.timer.next_date_by_weekday(weekday_int[0])
 			events = get_events(cal_info, service, date)
 		else:
+			# An specific inserted date
 			start_date = None
 			end_date = None
 			date = src.converter.get_date(text)
+			
+			# Return the res. date if a erorr accure
 			if isinstance(date, str):
 				return date
 			elif isinstance(date, list):
+				# Two date
 				start_date = date[0]
 				end_date = date[1]
 			else:
+				# One date
 				start_date = date
 			
 			if end_date is None:
 				end_date = start_date
 			
 			events = get_events(cal_info, service, start_date, end_date)
-
+	
+	# Return the output if any, else no data found
 	if events is not None:
 		calendar_output(events)
 		return
 	
 	return "No upcoming events"
 
+# Creation/add of events to the Google calendar
 def add_event(text):
 	service = authenticate_google()
 	all_cal_info = owner_diff_calender(service)
@@ -222,6 +232,7 @@ def add_event(text):
 	# Time from text
 	clock = src.converter.get_clock(text)
 
+	# If time is defined, use it
 	if clock is not None:
 		start_time = datetime.datetime.strptime(clock[0] + ":00", '%H:%M:%S').time()
 		if len(clock) == 1:

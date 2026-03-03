@@ -84,7 +84,9 @@ python -m src.main
 ```
 
 ### Running tests
-(Not yet integrated)
+```bash
+python -m pytest
+```
 
 # Contributing
 Contributions are welcome! Follow these steps:
