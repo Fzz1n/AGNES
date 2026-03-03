@@ -262,35 +262,3 @@ def add_event(text):
 	event = service.events().insert(calendarId=calendar_id, body=event).execute()
 	#print('Event created: %s' % (event.get('htmlLink')))
 	speak("Event created")
-
-'''
-def test():
-	month = "march"
-	date = "4"
-	title = "test python cal"
-	start_time= "18:30"
-	end_time= "19:30"
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	print(ad)
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time}")
-	ad = add_event(f"add to my calendar {title} {month} {date}")
-	ad = add_event(f"add to my calendar {month} {date}")
-	ad = add_event(f"add to my calendar {title} {date}")
-	ad = add_event(f"add to my calendar {title} {month} at {start_time}")
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	print(ad)
-	date = "4 to 5"
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	print(ad)
-	date = "20 to 4"
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	# test GET calendar data
-	array = ["wednesday", "12th", "12th april", "april 12th", "april", "april 12"]
-	for index in array:
-		calender_calll = lookup_calendar(index)
-		if calender_calll is not None:
-			print(calender_calll)
-
-	# test for adding event across multibel days
-test()
-'''
