@@ -1,33 +1,67 @@
 from src.IoT.calendar import add_event, lookup_event
 
-def test_add_event():
+# Tests for adding event to the calendar
+create_event = "add to my calendar"
+def test_add_event_with_time():
+	month = "march"
+	date = "4"
+	title = "test python add 'normal' event"
+	start_time= "18:30"
+	end_time= "19:30"
+	res = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	assert res == "Event created"
+	
+def test_add_full_day_event():
+	month = "march"
+	date = "4"
+	title = "test python full day"
+	res = add_event(f"add to my calendar {title} {month} {date}")
+	assert res == "Event created"
+    
+def test_add_event_multiple_days():
+	month = "march"
+	date = "4 to 5"
+	title = "test python multi"
+	res = add_event(f"add to my calendar {title} {month} {date}")
+	assert res == "Event created"
+    
+def test_add_event_next_year():
 	month = "march"
 	date = "4"
 	title = "test python cal"
-	start_time= "18:30"
-	end_time= "19:30"
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	print(ad)
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time}")
-	ad = add_event(f"add to my calendar {title} {month} {date}")
-	ad = add_event(f"add to my calendar {month} {date}")
-	ad = add_event(f"add to my calendar {title} {date}")
-	ad = add_event(f"add to my calendar {title} {month} at {start_time}")
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	print(ad)
-	date = "4 to 5"
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	print(ad)
-	date = "20 to 4"
-	ad = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
-	# test GET calendar data
-	array = ["wednesday", "12th", "12th april", "april 12th", "april", "april 12"]
-	for index in array:
-		calender_calll = lookup_event(index)
-		if calender_calll is not None:
-			print(calender_calll)
+	start_time= "17:30"
+	end_time= "18:00"
+	res = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time} next year")
+	assert res == "Event created"
 
-	# test for adding event across multibel days
+def test_add_event_without_title():
+	month = "march"
+	date = "4"
+	start_time= "17:30"
+	end_time= "18:00"
+	res = add_event(f"add to my calendar {month} {date} at {start_time} to {end_time} next year")
+	assert res == "Missing a title."
+
+def test_add_event_without_date():
+	month = "march"
+	title = "test python cal"
+	start_time= "17:30"
+	end_time= "18:00"
+	res = add_event(f"add to my calendar {title} {month} at {start_time} to {end_time} next year")
+	assert res == "A date is missing."
+    
+def test_add_event_without_month():
+	date = "4"
+	title = "test python cal"
+	start_time= "17:30"
+	end_time= "18:00"
+	res = add_event(f"add to my calendar {title} {date} at {start_time} to {end_time}")
+	assert res == "A month is missing."
+
+def test_add_event_without_anything():
+	res = add_event(f"add to my calendar")
+	assert res == "A month is missing."
+
 
 # Test lookup in the calendar
 lookup_start = "anything in my calendar"
@@ -48,20 +82,20 @@ def test_lookup_event_random_week_day():
 	assert res == None or res == "No upcoming events"
 
 def test_lookup_event_specific_date():
-	res = lookup_event(f"{lookup_start} April 12th")
+	res = lookup_event(f"{lookup_start} april 12th")
 	assert res == None or res == "No upcoming events"
 
-	res = lookup_event(f"{lookup_start} April 12")
+	res = lookup_event(f"{lookup_start} april 12")
 	assert res == None or res == "No upcoming events"
 
-	res = lookup_event(f"{lookup_start} 12 April")
+	res = lookup_event(f"{lookup_start} 12 april")
 	assert res == None or res == "No upcoming events"
 
-	res = lookup_event(f"{lookup_start} 12th April")
+	res = lookup_event(f"{lookup_start} 12th april")
 	assert res == None or res == "No upcoming events"
 
 def test_lookup_event_specific_date_next_year():
-	res = lookup_event(f"{lookup_start} April 12th next year")
+	res = lookup_event(f"{lookup_start} april 12th next year")
 	assert res == None or res == "No upcoming events"
 
 def test_lookup_event_missing_month():
@@ -69,7 +103,7 @@ def test_lookup_event_missing_month():
 	assert res == "A month is missing."
 
 def test_lookup_event_missing_date():
-	res = lookup_event(f"{lookup_start} April")
+	res = lookup_event(f"{lookup_start} april")
 	assert res == "A date is missing."
 
 def test_lookup_event_missing_everyting():

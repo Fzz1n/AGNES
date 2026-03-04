@@ -78,7 +78,7 @@ def get_date(text):
     month_num = src.global_var.months[month_in_month[0]]
 
     # Date
-    match = re.findall(r"(?<!:)\w\d+(?!:)", text)
+    match = re.findall(r"(?<![:\d])\d+(?![:\d])", text)
     if not match:
         return "A date is missing."
 

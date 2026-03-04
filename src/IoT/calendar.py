@@ -270,6 +270,14 @@ def add_event(text):
 			}
 		}
 
-	event = service.events().insert(calendarId=calendar_id, body=event).execute()
-	#print('Event created: %s' % (event.get('htmlLink')))
-	speak("Event created")
+	try:
+		event = service.events().insert(calendarId=calendar_id, body=event).execute()
+	except:
+		ret_msg = "An error accure"
+		speak(ret_msg)
+		return ret_msg
+	else:
+		res_msg = "Event created"
+		#print('Event created: %s' % (event.get('htmlLink')))
+		speak(res_msg)
+		return res_msg
