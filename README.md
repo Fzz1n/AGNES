@@ -27,14 +27,15 @@
 
 ## Project Structure
 ```plaintext
-src/
-├── mp3_files/          # Diff. sound clips
-├── calc.py             # Calculation and eaquations
-├── converter.py        # Converts to and from diff. vaules
-├── IoT.py              # Communication to and from Internet of Things
-├── main.py             # Communication (I/O)
-├── sound_effects.py    # Playing diff. files
-└── timer.py            # Set diff. timers for user
+├── credentials.json        # Necessary file for comunitecate to `Google calendar`
+└── src/
+    ├── mp3_files/          # Diff. sound clips
+    ├── calc.py             # Calculation and eaquations
+    ├── converter.py        # Converts to and from diff. vaules
+    ├── IoT.py              # Communication to and from Internet of Things
+    ├── main.py             # Communication (I/O)
+    ├── sound_effects.py    # Playing diff. files
+    └── timer.py            # Set diff. timers for user
 ```
 
 ## Getting Started
@@ -74,6 +75,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+5. Create and insert a `credentials.json` from [Goggle](https://developers.google.com/workspace/guides/create-credentials) in to the root folder `AGNES`
+
 ### Running the App for the First Time
 Connect your iOS device and start the program with:
 ```bash
@@ -81,7 +84,9 @@ python -m src.main
 ```
 
 ### Running tests
-(Not yet integrated)
+```bash
+python -m pytest
+```
 
 # Contributing
 Contributions are welcome! Follow these steps:

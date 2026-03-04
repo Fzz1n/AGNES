@@ -9,7 +9,7 @@ from src import sound_effects
 from src import calc
 from src import converter
 from src import timer
-from src.IoT import light, weather
+from src.IoT import light, weather, calendar
 
 def main():
     r = sr.Recognizer()
@@ -141,6 +141,13 @@ def main():
             elif "light" in text or "turn" in text or "set" in text or "going to bed" in text:
                 t = threading.Thread(target=light.controlling_lights, args=(text,))
                 t.start()
+            elif "calendar" in text:
+                if "add" in text:
+                    cal_res = calendar.add_event(text)
+                    if cal_res is not None:
+                        speak(cal_res)
+                else:
+                    calendar.lookup_event(text)
             elif "joke" in text:
                 speak("what do you call a cow without legs")
                 time.sleep(2)

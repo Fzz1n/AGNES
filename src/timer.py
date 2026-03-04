@@ -43,6 +43,17 @@ def current_month_name():
 def current_week_number():
     return time.strftime("%V")
 
+# Get the next date based on a week day name
+def next_date_by_weekday(target_weekday: int):
+    today = datetime.date.today()
+    today_weekday = today.weekday()  # 0=Mon, 6=Sun
+    
+    days_ahead = (target_weekday - today_weekday) % 7
+    if days_ahead == 0:
+        days_ahead = 7 
+    
+    return today + datetime.timedelta(days=days_ahead)
+
 # Compare old current time in sec
 def older_than_7_days(start_time):
     if start_time is None:
