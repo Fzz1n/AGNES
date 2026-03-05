@@ -27,15 +27,18 @@
 
 ## Project Structure
 ```plaintext
-├── credentials.json        # Necessary file for comunitecate to `Google calendar`
+├── credentials.json            # Necessary file for comunitecate to `Google calendar`
 └── src/
-    ├── mp3_files/          # Diff. sound clips
-    ├── calc.py             # Calculation and eaquations
-    ├── converter.py        # Converts to and from diff. vaules
-    ├── IoT.py              # Communication to and from Internet of Things
-    ├── main.py             # Communication (I/O)
-    ├── sound_effects.py    # Playing diff. files
-    └── timer.py            # Set diff. timers for user
+    ├── _tests_/                # Diff. tests
+    ├── IoT/                    # Communication to and from, Internet of Things
+    ├── mp3_files/              # Diff. sound clips
+    ├── calc.py                 # Calculation and eaquations
+    ├── converter.py            # Converts to and from diff. vaules
+    ├── global_var.py           # Global variables
+    ├── main.py                 # The main app
+    ├── sound_effects.py        # Playing diff. files
+    ├── timer.py                # Set diff. timers for user
+    └── voice_communication.py  # Communication (I/O)
 ```
 
 ## Getting Started

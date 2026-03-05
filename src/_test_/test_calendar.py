@@ -8,21 +8,21 @@ def test_add_event_with_time():
 	title = "test python add 'normal' event"
 	start_time= "18:30"
 	end_time= "19:30"
-	res = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time}")
+	res = add_event(f"{create_event} {title} {month} {date} at {start_time} to {end_time}")
 	assert res == "Event created"
 	
 def test_add_full_day_event():
 	month = "march"
 	date = "4"
 	title = "test python full day"
-	res = add_event(f"add to my calendar {title} {month} {date}")
+	res = add_event(f"{create_event} {title} {month} {date}")
 	assert res == "Event created"
     
 def test_add_event_multiple_days():
 	month = "march"
 	date = "4 to 5"
 	title = "test python multi"
-	res = add_event(f"add to my calendar {title} {month} {date}")
+	res = add_event(f"{create_event} {title} {month} {date}")
 	assert res == "Event created"
     
 def test_add_event_next_year():
@@ -31,7 +31,7 @@ def test_add_event_next_year():
 	title = "test python cal"
 	start_time= "17:30"
 	end_time= "18:00"
-	res = add_event(f"add to my calendar {title} {month} {date} at {start_time} to {end_time} next year")
+	res = add_event(f"{create_event} {title} {month} {date} at {start_time} to {end_time} next year")
 	assert res == "Event created"
 
 def test_add_event_without_title():
@@ -39,7 +39,7 @@ def test_add_event_without_title():
 	date = "4"
 	start_time= "17:30"
 	end_time= "18:00"
-	res = add_event(f"add to my calendar {month} {date} at {start_time} to {end_time} next year")
+	res = add_event(f"{create_event} {month} {date} at {start_time} to {end_time} next year")
 	assert res == "Missing a title."
 
 def test_add_event_without_date():
@@ -47,7 +47,7 @@ def test_add_event_without_date():
 	title = "test python cal"
 	start_time= "17:30"
 	end_time= "18:00"
-	res = add_event(f"add to my calendar {title} {month} at {start_time} to {end_time} next year")
+	res = add_event(f"{create_event} {title} {month} at {start_time} to {end_time} next year")
 	assert res == "A date is missing."
     
 def test_add_event_without_month():
@@ -55,11 +55,11 @@ def test_add_event_without_month():
 	title = "test python cal"
 	start_time= "17:30"
 	end_time= "18:00"
-	res = add_event(f"add to my calendar {title} {date} at {start_time} to {end_time}")
+	res = add_event(f"{create_event} {title} {date} at {start_time} to {end_time}")
 	assert res == "A month is missing."
 
 def test_add_event_without_anything():
-	res = add_event(f"add to my calendar")
+	res = add_event(create_event)
 	assert res == "A month is missing."
 
 

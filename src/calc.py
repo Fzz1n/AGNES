@@ -22,7 +22,7 @@ def ingers_equation(value1, value2, proc1 = None, proc2 = None):
 
 # Warter to rice ration calc.
 def water_to_rice(info):
-    if len(info) == 0:
+    if not isinstance(info, int) or not isinstance(info, float):
         return "sorry i don't understand"
     amount = info[0]
     unit = info[1]

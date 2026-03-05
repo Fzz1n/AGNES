@@ -113,6 +113,7 @@ def weather_station():
         
     return weather_data 
 
+# Formate the weather projection to user
 def weather_forcast(item, when):
     min_t = item["min_temp"]
     max_t = item["max_temp"]
@@ -124,7 +125,7 @@ def weather_forcast(item, when):
         weather_projection += f" and {round(prec)} mm of rain."
     return weather_projection
 
-# Look up the diff. weather data
+# Look up the diff. weather data giving: todat, tomorrow, or a weekday
 def lookup_weather(text):
     weather_data = weather_station()
     if isinstance(weather_data, str) or weather_data is None:
@@ -132,10 +133,14 @@ def lookup_weather(text):
     
     weather_by_day = {item["day"]: item for item in weather_data}
 
-    if "tomorrow" in text:
+    if "today" in text:
+        today = timer.todays_weekday_name().lower()
+        return weather_forcast(weather_by_day[today], "today")
+    elif "tomorrow" in text:
         tomorrow = timer.todays_weekday_name(1).lower()
         return weather_forcast(weather_by_day[tomorrow], "tomorrow")
     else:
+        # Weather on a inserted weekday
         for week_day in src.global_var.weeks_day_name:
             if week_day in text and week_day in weather_by_day:
                 return weather_forcast(weather_by_day[week_day], week_day)

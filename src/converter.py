@@ -20,7 +20,7 @@ def string_to_float(s):
         #print("Invalid input: cannot convert to integer")
         return ""
 
-def get_number(text):
+def get_number_int(text):
     text = text.replace("%", "")
     array = text.split(" ")
     num = 0
@@ -31,7 +31,7 @@ def get_number(text):
             break
     return num
 
-def get_two_numbers(text):
+def get_two_numbers_float(text):
     text = text.replace("%", "")
     array = text.split(" ")
     arr = []
@@ -52,12 +52,14 @@ def get_number_and_unit(text):
         res = string_to_float(item)
         if res != "":
             res_array.append(res)
+            if i + 1 == len(text_array):
+                return "a unit is missing"
             res_array.append(text_array[i + 1])
             break
     return res_array
 
 def get_time(text):
-    number = get_number(text)
+    number = get_number_int(text)
     if "hours" in text:
         return number * 60 * 60
     elif "minutes" in text:
@@ -83,10 +85,17 @@ def get_date(text):
         return "A date is missing."
 
     first_num = match[0]
-    first_date = datetime.datetime(int(year), int(month_num), int(first_num)).date()
-    
+    if int(first_num) > 31 or int(first_num) < 1:
+        print("invalid")
+        return "The date is invalid."
+    try:
+        first_date = datetime.datetime(int(year), int(month_num), int(first_num)).date()
+    except:
+        return "Not a valid date."
     if len(match) == 2:
         sec_num = match[1]
+        if int(sec_num) > 32 or int(sec_num) < 1:
+            return "The date is invalid."
         # Check if the sec_num is smaller, when set the sec_num in next month 
         if int(first_num) > int(sec_num):
             # End of the year? Switch month and year
@@ -95,9 +104,11 @@ def get_date(text):
                 month_num = 1
             else:
                 month_num += 1
-
-        sec_date = datetime.datetime(int(year), int(month_num), int(sec_num)).date()
-
+        try:
+            sec_date = datetime.datetime(int(year), int(month_num), int(sec_num)).date()
+        except:
+            return "Not a valid date."
+        
         return [first_date, sec_date]
     
     return first_date

@@ -27,7 +27,7 @@ def create_body(command):
 		return {"on":False}
 
 	elif "set" in command:
-		value = converter.get_number(command)
+		value = converter.get_number_int(command)
 		if value < 0 or value > 100:
 			return "invalid percentage"
 		light_level = calc.ingers_equation(bri_max, None, 100, value)
@@ -78,15 +78,23 @@ def get_status(url):
 						return round(light_level)
 	return
 
+# Help function for retunning an erro message
+def error_msg(text):
+    speak(text)
+    return text
+
 # Creation of the API route
 def controlling_lights(command):
 	global rest_api
 	url = None
+
+	# Decidign the exicution method
 	if "kill" in command or "everything off" in command:
 		controlling_lights("off living room")
 		controlling_lights("off bedroom")
 		speak("copy that")
 		return
+	
 	elif "going to bed" in command:
 		controlling_lights("off living room")
 		controlling_lights("set bedroom to 50")
@@ -94,43 +102,46 @@ def controlling_lights(command):
 		controlling_lights("off bedroom")
 		speak("copy that")
 		return
+
 	elif "room" in command:
 		room_number = get_rooms_no(command)
 		if room_number is None:
-			speak("the room doesn't exist")
-			return
+			return error_msg("the room doesn't exist")
 		url = f"{rest_api}groups/{room_number}/action"
+
 	else:
+		# The input is a spesafic source or invalid 
 		number = deff_single_source(command)
 		if number is None:
-			speak("Not a valid source")
-			return
+			return error_msg("Not a valid source")
 		url = f"{rest_api}lights/{number}/state"
 
-	# get the status from the giving sorce
+	# Get the status from the giving sorce
 	if "status" in command:
 		light_level = get_status(url)
 		if light_level is None:
-			speak("No info was found")
-			return
+			return error_msg("No info was found")
 		speak(f"The light level is set to: {light_level}%")
 		return
 
+	# Create and validate the body
 	body = create_body(command)
 	if isinstance(body, str) or body is None:
 		if body is not None:
 			speak(body)
 			return
 		else:
-			speak("invalid execution")
-			return
+			return error_msg("Invalid execution of body")
 
+	# Send request
 	try:
 		r = requests.put(url, json.dumps(body), timeout=5)
 	except:
-		print("PUT error. Try again later")
+		print("Error: make sure the correct information are inserted in the .env")
+		speak("PUT error. Try again later")
+
 	response = r.json()
 	if isinstance(response, list) and "success" in response[0]:
 		return
-	speak("an error acure")
-	return
+	
+	return error_msg("An error acure")

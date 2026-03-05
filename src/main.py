@@ -36,7 +36,7 @@ def main():
                 sound_effects.play_mp3("kazoo_kid")
             elif "energy threshold" in text:
                 if "change" in text:
-                    number = converter.get_number(text)
+                    number = converter.get_number_int(text)
                     if not 50 <= number <= 800:
                         speak("Not a valid input")
                     else:
@@ -70,7 +70,7 @@ def main():
             elif "weather" in text:
                 speak(weather.lookup_weather(text))
             elif "calculate" in text or "what is" in text:
-                numbers = converter.get_two_numbers(text)
+                numbers = converter.get_two_numbers_float(text)
                 if numbers is None:
                     speak("Missing one or two numbers")
                 else:
@@ -131,7 +131,7 @@ def main():
                     sound_effects.play_mp3("game_on")
             elif "adjust" in text:
                 if "audio" in text or "sound" in text:
-                    sound_effects.adjust_sound(converter.get_number(text))
+                    sound_effects.adjust_sound(converter.get_number_int(text))
             elif "misunderstanding counter" in text:
                 if "reset" in text:
                     src.global_var.misunderstanding_counter = 0
