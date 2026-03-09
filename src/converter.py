@@ -1,6 +1,7 @@
 import datetime
 import time
 import re
+from dateutil import relativedelta
 
 import src.global_var
 
@@ -60,11 +61,22 @@ def get_number_and_unit(text):
 
 def get_time(text):
     number = get_number_int(text)
-    if "hours" in text:
+    if "hour" in text:
         return number * 60 * 60
-    elif "minutes" in text:
+    elif "minute" in text:
         return number * 60
     return number
+
+def convert_seconds(sec):
+    rd = relativedelta.relativedelta(seconds=sec)
+    hours = rd.hours
+    minutes = rd.minutes
+    seconds = rd.seconds
+    if hours >= 1:
+        return "{:2d}:{:2d}:{:2d}".format(hours, minutes, seconds)
+    elif minutes >= 1:
+        return "{:2d} min {:2d} sec".format(minutes, seconds)
+    return "{:2d} sec".format(seconds)
 
 def get_date(text):
     month_in_month = [month for month in src.global_var.months if month in text]

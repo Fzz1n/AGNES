@@ -58,7 +58,10 @@ def main():
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "timer" in text:
-                if "stop" in text or "reset" in text:
+                if "left" in text:
+                    sec = src.global_var.time_left
+                    speak(converter.convert_seconds(sec))
+                elif "stop" in text or "reset" in text:
                     src.global_var.stop_event.set()
                     speak("Time stopped")
                 else:

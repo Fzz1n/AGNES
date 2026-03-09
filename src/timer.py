@@ -13,6 +13,7 @@ def countdown(t):
         print(timer, end='\r')  # Overwrite the line each second
         time.sleep(1)
         t -= 1
+        src.global_var.time_left = t
     if not src.global_var.stop_event.is_set():
         sound_effects.play_mp3("alarms/classic_alarm")
 
