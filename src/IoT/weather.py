@@ -101,7 +101,7 @@ def weather_station():
     latitude, longitude = coordinates
     
     weather_data = src.global_var.weather_data
-    if weather_data is None or timer.older_than_7_days(src.global_var.weather_data_age):
+    if weather_data is None or timer.older_than_x_days(src.global_var.weather_data_age, 3): # max 3 days
         print("Finding new weather data")
         weather_data = get_weather_data(latitude, longitude)
         if weather_data is None:

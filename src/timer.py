@@ -56,11 +56,11 @@ def next_date_by_weekday(target_weekday: int):
     return today + datetime.timedelta(days=days_ahead)
 
 # Compare old current time in sec
-def older_than_7_days(start_time):
+def older_than_x_days(start_time, max_age):
     if start_time is None:
         return True
     diff_sec = current_time_sec() - start_time
     diff_days = diff_sec / (60 * 60 * 24)
     
-    # Max 7 days old
-    return diff_days > 7
+    # Max x days old
+    return diff_days > max_age
