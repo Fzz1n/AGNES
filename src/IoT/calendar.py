@@ -115,19 +115,28 @@ def get_events(cal_info, service, start_day, end_day = None):
 
 	except HttpError as error:
 		print(f"An error occurred: {error}")
-		speak("An error occurred")
-		return
+		return "An error occurred"
 
 # Formate the return from the google calender
-def calendar_output(events):
+def calendar_output(events, specific_date):
 	for event in events:
-		event_info = event["event_start"].strftime('%B %d')
-		if event["event_start"] != event["event_end"]:
-			event_info += event["event_end"].strftime('-%d')
+		# Starting day
+		event_info = event["event_start"].strftime('%A')
+		if specific_date:
+			event_info = event["event_start"].strftime('%B %d')
 
+		# Add the end date
+		if event["event_start"] != event["event_end"]:
+			if specific_date:
+				event_info += event["event_end"].strftime('-%d')
+			else:
+				event_info += event["event_end"].strftime('-%A')
+
+		# Add the title of the event
 		event_info += f": {event['title']}"
 		
-		if  event["time_start"] is not None:
+		# Add the event's time
+		if event["time_start"] is not None:
 			start_t = event["time_start"].strftime('%H:%M')
 			end_t = event["time_end"].strftime('%H:%M')
 			event_info += f", {start_t}-{end_t}"
@@ -143,6 +152,7 @@ def lookup_event(text):
 	tomorrow = today + datetime.timedelta(days=1)
 	date_monday = src.timer.next_date_by_weekday(0)
 	date_sunday = date_monday + datetime.timedelta(days=6)
+	specific_date = False
 	
 	events = None
 	# Depending on tehe input it getting data from eather: a week, today, tomorrow, upcoming mon- to sunday, or a inputted date
@@ -156,6 +166,7 @@ def lookup_event(text):
 		events = get_events(cal_info, service, tomorrow)
 
 	else:
+		specific_date = True
 		weekday_int = [src.global_var.weeks_day_name_int[week_day] for week_day in src.global_var.weeks_day_name if week_day in text]
 		if len(weekday_int) != 0:
 			# Searches for the next upcoming monday - sunday
@@ -185,7 +196,7 @@ def lookup_event(text):
 	
 	# Return the output if any, else no data found
 	if events is not None:
-		calendar_output(events)
+		calendar_output(events, specific_date)
 		return
 	
 	return "No upcoming events"
@@ -220,8 +231,7 @@ def add_event(text):
 	# Target calendar
 	match = re.search(r"(\w+)\s+calendar", text)
 	if not match:
-		print("Missing calender")
-		speak("Missing calender")
+		return "Missing calender"
 	target = match.group(1)
 
 	calendar_id = next(
@@ -273,11 +283,7 @@ def add_event(text):
 	try:
 		event = service.events().insert(calendarId=calendar_id, body=event).execute()
 	except:
-		ret_msg = "An error accure"
-		speak(ret_msg)
-		return ret_msg
+		return "An error accure"
 	else:
-		res_msg = "Event created"
 		#print('Event created: %s' % (event.get('htmlLink')))
-		speak(res_msg)
-		return res_msg
+		return "Event created"
