@@ -87,8 +87,14 @@ python -m src.main
 ```
 
 ### Running tests
+Run all tests
 ```bash
 python -m pytest
+```
+
+Run specific test file
+```bash
+python -m pytest src/_test_/{name on file}
 ```
 
 # Contributing
