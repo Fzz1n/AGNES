@@ -166,13 +166,13 @@ def lookup_event(text):
 		events = get_events(cal_info, service, tomorrow)
 
 	else:
-		specific_date = True
 		weekday_int = [src.global_var.weeks_day_name_int[week_day] for week_day in src.global_var.weeks_day_name if week_day in text]
 		if len(weekday_int) != 0:
 			# Searches for the next upcoming monday - sunday
 			date = src.timer.next_date_by_weekday(weekday_int[0])
 			events = get_events(cal_info, service, date)
 		else:
+			specific_date = True
 			# An specific inserted date
 			start_date = None
 			end_date = None
