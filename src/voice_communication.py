@@ -24,7 +24,7 @@ def speak(text):
 
 def get_audio(r, source, lang):
     try:
-        audio = r.listen(source)
+        audio = r.listen(source, timeout=10, phrase_time_limit=8)
         said = r.recognize_google(audio, language=lang) # Danish -> da-DK || English(US) -> en-US
         print("You said:", said.lower())
         return said.lower()
