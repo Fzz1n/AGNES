@@ -149,12 +149,14 @@ def main():
                 t = threading.Thread(target=light.controlling_lights, args=(text,))
                 t.start()
             elif "calendar" in text:
+                cal_res = None
                 if "add" in text:
                     cal_res = calendar.add_event(text)
-                    if cal_res is not None:
-                        speak(cal_res)
                 else:
-                    calendar.lookup_event(text)
+                    cal_res = calendar.lookup_event(text)
+                
+                if cal_res is not None:
+                    speak(cal_res)
             elif "joke" in text:
                 speak("what do you call a cow without legs")
                 time.sleep(2)
