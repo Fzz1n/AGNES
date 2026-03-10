@@ -13,15 +13,19 @@ from src.IoT import light, weather, calendar
 
 def main():
     r = sr.Recognizer()
+    r.pause_threshold = 1.0 
     r.dynamic_energy_threshold = False
-    r.energy_threshold = 200
-    r.listen
+    r.energy_threshold = 250
     
     with sr.Microphone() as source:
         print("Energy threshold:", r.energy_threshold)
         
-        while True:    
+        while True:
+            # r.adjust_for_ambient_noise(source, duration=1) # auto calibrate sound    
             text = get_audio(r, source, "en-US")
+
+            if text is None:
+                continue
 
             if "69" in text:
                 sound_effects.play_mp3("nice_meme")
@@ -35,7 +39,7 @@ def main():
             elif "who are you" in text:
                 sound_effects.play_mp3("kazoo_kid")
             elif "energy threshold" in text:
-                if "change" in text:
+                if "change" in text or "set" in text:
                     number = converter.get_number_int(text)
                     if not 50 <= number <= 800:
                         speak("Not a valid input")
