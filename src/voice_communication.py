@@ -37,7 +37,7 @@ def get_audio(r, source, lang):
         
         except sr.UnknownValueError:
             src.global_var.misunderstanding_counter += 1
-            print(f"Couldn't understand audio {current_time()}")
+            print(f"Couldn't understand audio {current_time()}, Counter: {src.global_var.misunderstanding_counter}")
             continue
         
         except sr.RequestError as e:
