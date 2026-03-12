@@ -2,6 +2,7 @@ import threading
 
 stop_event = threading.Event()
 misunderstanding_counter = 0
+misunderstanding_timer = None
 weeks_day_name = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 weeks_day_name_int = {"monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3, "friday": 4, "saturday":5 , "sunday": 6}
 coordinates = None

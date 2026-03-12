@@ -5,7 +5,7 @@ from gtts import gTTS
 import speech_recognition as sr
 
 import src.global_var
-from src.timer import current_time
+from src.timer import current_time, current_time_sec
 
 def speak(text):
     src.global_var.last_answer = text # Saving the answer
@@ -37,6 +37,26 @@ def get_audio(r, source, lang):
         
         except sr.UnknownValueError:
             src.global_var.misunderstanding_counter += 1
+            miss_counter = src.global_var.misunderstanding_counter
+            miss_timer = src.global_var.misunderstanding_timer
+            time_now = current_time_sec()
+            
+            if miss_timer is None:
+                src.global_var.misunderstanding_timer = time_now
+                
+            elif miss_counter >= 25 and (miss_timer - time_now) <= 300:
+                r.energy_threshold += 75
+                src.global_var.misunderstanding_counter = 0
+                src.global_var.misunderstanding_timer = time_now
+                print(f"upgrade to {r.energy_threshold}")
+                speak(f"Upgrading energy threshold to {r.energy_threshold}")
+                
+            elif (miss_timer - time_now) > 300:
+                print("Resetting values")
+                src.global_var.misunderstanding_timer = time_now
+                src.global_var.misunderstanding_counter = 0
+                r.energy_threshold = 175
+                
             print(f"Couldn't understand audio {current_time()}, Counter: {src.global_var.misunderstanding_counter}")
             continue
         
