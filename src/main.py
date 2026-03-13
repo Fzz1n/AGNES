@@ -135,6 +135,7 @@ def main():
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
                 elif "game" in text:
+                    r.energy_threshold = 800
                     sound_effects.play_mp3("game_on")
             elif "adjust" in text:
                 if "audio" in text or "sound" in text:
