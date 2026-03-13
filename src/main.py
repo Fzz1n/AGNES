@@ -15,7 +15,7 @@ def main():
     r = sr.Recognizer()
     r.pause_threshold = 1.0 
     r.dynamic_energy_threshold = False
-    r.energy_threshold = 250
+    r.energy_threshold = 175
     
     with sr.Microphone() as source:
         print("Energy threshold:", r.energy_threshold)
