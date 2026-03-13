@@ -4,6 +4,7 @@ import threading
 import speech_recognition as sr
 
 from src.voice_communication import speak, get_audio
+from wakeonlan import send_magic_packet
 import src.global_var
 from src import sound_effects
 from src import calc
@@ -136,6 +137,9 @@ def main():
                     sound_effects.play_mp3("Obi-Wan")
                 elif "game" in text:
                     r.energy_threshold = 800
+                    mac = os.environ["pc_mac_address"]
+                    ip = os.environ["pc_ip_address"]
+                    send_magic_packet(mac, ip_address=ip)
                     sound_effects.play_mp3("game_on")
             elif "adjust" in text:
                 if "audio" in text or "sound" in text:
