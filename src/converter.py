@@ -79,7 +79,7 @@ def convert_seconds(sec):
     return "{:2d} sec".format(seconds)
 
 def get_date(text):
-    month_in_month = [month for month in src.global_var.months if month in text]
+    month_in_text = [month for month in src.global_var.MONTHS if month in text]
 
     # Year
     year = datetime.date.today().year
@@ -87,9 +87,9 @@ def get_date(text):
         year += 1
     
     # Month
-    if not len(month_in_month):
+    if not len(month_in_text):
         return "A month is missing."
-    month_num = src.global_var.months[month_in_month[0]]
+    month_num = src.global_var.MONTHS.index(month_in_text[0]) + 1
 
     # Date
     match = re.findall(r"(?<![:\d])\d+(?![:\d])", text)
@@ -100,10 +100,12 @@ def get_date(text):
     if int(first_num) > 31 or int(first_num) < 1:
         print("invalid")
         return "The date is invalid."
+    
     try:
         first_date = datetime.datetime(int(year), int(month_num), int(first_num)).date()
     except:
         return "Not a valid date."
+    
     if len(match) == 2:
         sec_num = match[1]
         if int(sec_num) > 32 or int(sec_num) < 1:
@@ -111,7 +113,7 @@ def get_date(text):
         # Check if the sec_num is smaller, when set the sec_num in next month 
         if int(first_num) > int(sec_num):
             # End of the year? Switch month and year
-            if month_num == src.global_var.months["december"]:
+            if month_num == (src.global_var.MONTHS.index("december") + 1):
                 year += 1
                 month_num = 1
             else:
