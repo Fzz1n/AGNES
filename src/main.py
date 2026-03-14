@@ -62,7 +62,7 @@ def main():
                     src.global_var.stop_event.clear()
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
-            elif "timer" in text:
+            elif "time" in text:
                 if "left" in text:
                     sec = src.global_var.time_left
                     speak(converter.convert_seconds(sec))
@@ -136,7 +136,7 @@ def main():
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
                 elif "game" in text:
-                    r.energy_threshold = 800
+                    r.energy_threshold = 750
                     mac = os.environ["pc_mac_address"]
                     ip = os.environ["pc_ip_address"]
                     send_magic_packet(mac, ip_address=ip)
@@ -151,8 +151,14 @@ def main():
                 else:
                     speak(f"The counter is now: {src.global_var.misunderstanding_counter}")
             elif "light" in text or "turn" in text or "set" in text or "going to bed" in text:
-                t = threading.Thread(target=light.controlling_lights, args=(text,))
-                t.start()
+                if "computer" in text or "pc" in text:
+                    r.energy_threshold = 750
+                    mac = os.environ["pc_mac_address"]
+                    ip = os.environ["pc_ip_address"]
+                    send_magic_packet(mac, ip_address=ip)
+                else:
+                    t = threading.Thread(target=light.controlling_lights, args=(text,))
+                    t.start()
             elif "calendar" in text:
                 cal_res = None
                 if "add" in text:
