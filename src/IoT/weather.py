@@ -2,9 +2,10 @@ import geocoder
 import openmeteo_requests
 import requests_cache
 from retry_requests import retry
+from ast import literal_eval
 
 from src import timer
-import src.global_var
+from src.global_var import WEEKSDAY_NAME, get_global_var, set_global_var
 
 # Diff. api req: https://open-meteo.com/en/docs
 
@@ -64,16 +65,15 @@ def get_weather_data(lat, lon):
 
         day_data = {
             "day": timer.todays_weekday_name(d).lower(),
-            "min_temp": min(hourly_apparent_temperature[start:end]),
-            "max_temp": max(hourly_apparent_temperature[start:end]),
-            "max_wind": max(hourly_wind_speed_10m[start:end]),
-            "max_humidity": max(hourly_relative_humidity_2m[start:end]),
-            "max_precipitation": max(hourly_precipitation[start:end]),
-            "total_precipitation": sum(hourly_precipitation[start:end]),
-            "max_rain": max(hourly_rain[start:end]),
-            "max_snow": max(hourly_snowfall[start:end]),
+            "min_temp": float(min(hourly_apparent_temperature[start:end])),
+            "max_temp": float(max(hourly_apparent_temperature[start:end])),
+            "max_wind": float(max(hourly_wind_speed_10m[start:end])),
+            "max_humidity": float(max(hourly_relative_humidity_2m[start:end])),
+            "max_precipitation": float(max(hourly_precipitation[start:end])),
+            "total_precipitation": float(sum(hourly_precipitation[start:end])),
+            "max_rain": float(max(hourly_rain[start:end])),
+            "max_snow": float(max(hourly_snowfall[start:end])),
         }
-
         weather_data.append(day_data)
 
     return weather_data
@@ -88,30 +88,31 @@ def get_current_gps_coordinates():
 
 # Collectiong the nessary weather data 
 def weather_station():
-    coordinates = src.global_var.coordinates
+    coordinates = get_global_var("coordinates")
     if coordinates is None:
         coordinates = get_current_gps_coordinates()
         if coordinates is None:
             return "Unable to retrieve your GPS coordinates."
         else:
-            src.global_var.coordinates = coordinates
+            set_global_var("coordinates", str(coordinates))
     else:
         print(f"Using old coordinates: {coordinates}")
-    
+        coordinates = literal_eval(coordinates)
     latitude, longitude = coordinates
     
-    weather_data = src.global_var.weather_data
-    if weather_data is None or timer.older_than_x_days(src.global_var.weather_data_age, 3): # max 3 days
+    weather_data = get_global_var("weather_data")
+    if weather_data is None or timer.older_than_x_days(get_global_var("weather_data_age"), 3): # max 3 days
         print("Finding new weather data")
         weather_data = get_weather_data(latitude, longitude)
         if weather_data is None:
             return "Unable to receive weather data."
-        src.global_var.weather_data = weather_data
-        src.global_var.weather_data_age = timer.current_time_sec()
+        set_global_var("weather_data", str(weather_data))
+        set_global_var("weather_data_age", timer.current_time_sec())
     else:
-        print("Using old data wather data")
+        print("Using old wather data")
+        weather_data = literal_eval(weather_data)
         
-    return weather_data 
+    return weather_data
 
 # Formate the weather projection to user
 def weather_forcast(item, when):
@@ -141,7 +142,7 @@ def lookup_weather(text):
         return weather_forcast(weather_by_day[tomorrow], "tomorrow")
     else:
         # Weather on a inserted weekday
-        for week_day in src.global_var.weeks_day_name:
+        for week_day in WEEKSDAY_NAME:
             if week_day in text and week_day in weather_by_day:
                 return weather_forcast(weather_by_day[week_day], week_day)
                 

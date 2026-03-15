@@ -1,7 +1,7 @@
 import datetime
 import re
 import os.path
-import src.global_var
+from src.global_var import WEEKSDAY_NAME
 import src.converter
 import src.timer
 from src.voice_communication import speak
@@ -166,7 +166,7 @@ def lookup_event(text):
 		events = get_events(cal_info, service, tomorrow)
 
 	else:
-		weekday_int = [src.global_var.WEEKSDAY_NAME.index(week_day) for week_day in src.global_var.WEEKSDAY_NAME if week_day in text]
+		weekday_int = [WEEKSDAY_NAME.index(week_day) for week_day in WEEKSDAY_NAME if week_day in text]
 		if len(weekday_int) != 0:
 			# Searches for the next upcoming monday - sunday
 			date = src.timer.next_date_by_weekday(weekday_int[0])

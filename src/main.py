@@ -13,10 +13,11 @@ from src import timer
 from src.IoT import light, weather, calendar
 
 def main():
+    src.global_var.create_db()
     r = sr.Recognizer()
     r.pause_threshold = 1.0 
     r.dynamic_energy_threshold = False
-    r.energy_threshold = 175
+    r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
     
     with sr.Microphone() as source:
         print("Energy threshold:", r.energy_threshold)
@@ -45,8 +46,13 @@ def main():
                     if not 50 <= number <= 800:
                         speak("Not a valid input")
                     else:
-                        r.energy_threshold = number
-                        speak(f"energy threshold is now changed to: {number}")
+                        msg = f"energy threshold is now changed to: {number}"
+                        if "default" in text:
+                            src.global_var.set_global_var("default_energy_threshold", number)
+                            msg = "default " + msg
+                        else:
+                            r.energy_threshold = number
+                        speak(msg)
                 elif "reading" in text:
                     speak(f"{round(r.energy_threshold, 2)}")
                 elif "deactivate dynamic" in text:
@@ -173,7 +179,7 @@ def main():
                 time.sleep(2)
                 speak("ground beef")
             elif "please repeat" in text or "come again" in text or "sorry" in text:
-                speak(src.global_var.last_answer)
+                speak(src.global_var.get_global_var("last_answer"))
             elif "exit" in text:
                 print("Exiting program...")
                 break
