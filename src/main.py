@@ -57,7 +57,7 @@ def main():
                     speak(f"{round(r.energy_threshold, 2)}")
                 elif "deactivate dynamic" in text:
                     r.dynamic_energy_threshold = False
-                    r.energy_threshold = 200
+                    r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
                     speak("dynamic energy threshold is now deactivated")
                 elif "activate dynamic" in text:
                     r.dynamic_energy_threshold = True
@@ -142,7 +142,7 @@ def main():
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
                 elif "game" in text:
-                    r.energy_threshold = 750
+                    r.energy_threshold = 800
                     mac = os.environ["pc_mac_address"]
                     ip = os.environ["pc_ip_address"]
                     send_magic_packet(mac, ip_address=ip)
@@ -158,7 +158,7 @@ def main():
                     speak(f"The counter is now: {src.global_var.misunderstanding_counter}")
             elif "light" in text or "turn" in text or "set" in text or "going to bed" in text:
                 if "computer" in text or "pc" in text:
-                    r.energy_threshold = 750
+                    r.energy_threshold = 800
                     mac = os.environ["pc_mac_address"]
                     ip = os.environ["pc_ip_address"]
                     send_magic_packet(mac, ip_address=ip)

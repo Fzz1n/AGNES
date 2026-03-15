@@ -50,13 +50,17 @@ def get_audio(r, source, lang):
                 src.global_var.misunderstanding_timer = time_now
                 msg = f"Upgrading energy threshold to {r.energy_threshold}"
                 print(msg)
-                speak(msg)
+                if not r.energy_threshold > 500:
+                    speak(msg)
                 
             elif (time_now - miss_timer) > (60 * 30):
                 print("Resetting values")
                 src.global_var.misunderstanding_counter = 0
                 src.global_var.misunderstanding_timer = time_now
-                r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
+                if r.energy_threshold == 700:
+                    r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
+                else:
+                    r.energy_threshold -= 100
   
             print(f"Couldn't understand audio {current_time()}, Counter: {src.global_var.misunderstanding_counter}")
             continue
