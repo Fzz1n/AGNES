@@ -11,6 +11,7 @@ from src import calc
 from src import converter
 from src import timer
 from src.IoT import light, weather, calendar
+from src.notes import write, read
 
 def main():
     src.global_var.create_db()
@@ -162,6 +163,13 @@ def main():
                     mac = os.environ["pc_mac_address"]
                     ip = os.environ["pc_ip_address"]
                     send_magic_packet(mac, ip_address=ip)
+                elif "night":
+                    value = converter.get_number_int(text)
+                    if value < 0 or value > 100:
+                        speak("invalid percentage")
+                    else:
+                        src.global_var.set_global_var("night_light_level", value)
+                        speak("changed is confirmed")
                 else:
                     t = threading.Thread(target=light.controlling_lights, args=(text,))
                     t.start()
@@ -180,7 +188,12 @@ def main():
                 speak("ground beef")
             elif "please repeat" in text or "come again" in text or "sorry" in text:
                 speak(src.global_var.get_global_var("last_answer"))
+            elif "read" in text:
+                if "usage report" in text:
+                    speak(read("usage_report"))
             elif "exit" in text:
                 print("Exiting program...")
                 break
+            else:
+                write(text)
 main()

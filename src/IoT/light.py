@@ -8,18 +8,19 @@ load_dotenv()
 from src.voice_communication import speak
 from src import calc
 from src import converter
+from src.global_var import get_global_var
 
 # Golden webpage to "Get started": https://developers.meethue.com/develop/get-started-2/
-username = os.environ["hue_username"]
-hue_ip_adress = os.environ["hue_ip_address"]
-rest_api = f"http://{hue_ip_adress}/api/{username}/"
+USERNAME = os.environ["hue_username"]
+HUE_IP_ADDRESS = os.environ["hue_ip_address"]
+REST_API = f"http://{HUE_IP_ADDRESS}/api/{USERNAME}/"
 
 # Const for controlling the light
-bri_max = 255
+BRI_MAX = 255
 
 # Create the body
 def create_body(command):
-	global bri_max
+	global BRI_MAX
 	if "on " in command:
 		return {"on":True}
 
@@ -30,7 +31,7 @@ def create_body(command):
 		value = converter.get_number_int(command)
 		if value < 0 or value > 100:
 			return "invalid percentage"
-		light_level = calc.ingers_equation(bri_max, None, 100, value)
+		light_level = calc.ingers_equation(BRI_MAX, None, 100, value)
 		return {"on":True, "bri":int(light_level)}
 
 	elif "flash once" in command:
@@ -60,7 +61,7 @@ def deff_single_source(text):
 
 def get_status(url):
 	# Delete everyting from the last "/", including
-	global bri_max
+	global BRI_MAX
 	url = url.rsplit("/", 1)[0]
 
 	try:
@@ -74,7 +75,7 @@ def get_status(url):
 			if item == "state" or item == "action":
 				for key, value in response["state"].items():
 					if key == "bri":
-						light_level = calc.ingers_equation(bri_max, value, 100)
+						light_level = calc.ingers_equation(BRI_MAX, value, 100)
 						return round(light_level)
 	return
 
@@ -85,7 +86,7 @@ def error_msg(text):
 
 # Creation of the API route
 def controlling_lights(command):
-	global rest_api
+	global REST_API
 	url = None
 
 	# Decidign the exicution method
@@ -97,24 +98,24 @@ def controlling_lights(command):
 	
 	elif "going to bed" in command:
 		controlling_lights("off living room")
-		controlling_lights("set bedroom to 50")
+		controlling_lights(f"set bedroom to {get_global_var("night_light_level")}")
+		speak("copy that")
 		time.sleep(5 * 60) # 5 min
 		controlling_lights("off bedroom")
-		speak("copy that")
 		return
 
 	elif "room" in command:
 		room_number = get_rooms_no(command)
 		if room_number is None:
 			return error_msg("the room doesn't exist")
-		url = f"{rest_api}groups/{room_number}/action"
+		url = f"{REST_API}groups/{room_number}/action"
 
 	else:
 		# The input is a spesafic source or invalid 
 		number = deff_single_source(command)
 		if number is None:
 			return error_msg("Not a valid source")
-		url = f"{rest_api}lights/{number}/state"
+		url = f"{REST_API}lights/{number}/state"
 
 	# Get the status from the giving sorce
 	if "status" in command:
