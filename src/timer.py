@@ -30,7 +30,7 @@ def current_time():
 
 # Get todays date
 def todays_date():
-    return time.strftime("%x")
+    return datetime.date.today().strftime("%d-%m-%Y")
 
 # Get todays weekday name
 def todays_weekday_name(days_ahead = 0):

@@ -13,15 +13,17 @@ def create_db():
     try:
         con = sqlite3.connect("agnes.db")
         cur = con.cursor()
-        cur.execute("CREATE TABLE global_var(title, value)")
+        cur.execute("CREATE TABLE IF NOT EXISTS global_var(title TEXT UNIQUE, value)")
         data = [
             ("weather_data", None),
             ("weather_data_age", None),
             ("coordinates", None),
             ("last_answer", "No previous response"),
-            ("default_energy_threshold", 200)
+            ("default_energy_threshold", 200),
+            ("night_light_level", 30),
+            ("todays_date", None)
         ]
-        cur.executemany("INSERT INTO global_var VALUES(?, ?)", data)
+        cur.executemany("INSERT INTO global_var (title, value) VALUES (?, ?) ON CONFLICT(title) DO NOTHING", data)
         con.commit()
         print("Database Sqlite3.db formed.")
     except:
@@ -43,3 +45,4 @@ def set_global_var(text, var):
     cur = con.cursor()
     cur.execute("UPDATE global_var SET value = ? WHERE title = ?", [var, text])
     con.commit()
+create_db()

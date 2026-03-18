@@ -14,7 +14,13 @@ from src.IoT import light, weather, calendar
 from src.notes import write, read
 
 def main():
-    src.global_var.create_db()
+    # create/update DB and save todays date in it
+    old_date = src.global_var.get_global_var("todays_date")
+
+    if old_date is None:
+        src.global_var.set_global_var("todays_date", timer.todays_date())
+
+    # Set up microphone settings
     r = sr.Recognizer()
     r.pause_threshold = 1.0 
     r.dynamic_energy_threshold = False
@@ -29,19 +35,25 @@ def main():
 
             if text is None:
                 continue
+            phrase = text
 
             if "69" in text:
                 sound_effects.play_mp3("nice_meme")
             
             if "hello" in text:
+                phrase = "hello"
                 speak("hello, how are you?")
             elif "what's your name" in text:
+                phrase = "AGNES's name"
                 speak("My name is AGNES")
             elif "what does agnes stand for" in text:
+                phrase = "AGNES's dif."
                 speak("It stands for: Artificial Generative Nested Environment System")
             elif "who are you" in text:
+                phrase = "kazoo kid"
                 sound_effects.play_mp3("kazoo_kid")
             elif "energy threshold" in text:
+                phrase = "energy threshold"
                 if "change" in text or "set" in text:
                     number = converter.get_number_int(text)
                     if not 50 <= number <= 800:
@@ -64,12 +76,14 @@ def main():
                     r.dynamic_energy_threshold = True
                     speak("dynamic energy threshold is now activated")
             elif "deactivate microphone" in text:
+                phrase = "microphone"
                 speak("copy that")
                 if src.global_var.stop_event.is_set():
                     src.global_var.stop_event.clear()
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "time" in text:
+                phrase = "timer countdown"
                 if "left" in text:
                     sec = src.global_var.time_left
                     speak(converter.convert_seconds(sec))
@@ -83,8 +97,10 @@ def main():
                     t = threading.Thread(target=timer.start_timer, args=(text,))
                     t.start()
             elif "weather" in text:
+                phrase = "weather"
                 speak(weather.lookup_weather(text))
             elif "calculate" in text or "what is" in text:
+                phrase = "calculation"
                 numbers = converter.get_two_numbers_float(text)
                 if numbers is None:
                     speak("Missing one or two numbers")
@@ -123,8 +139,10 @@ def main():
                             result_str += "%"
                         speak(result_str)
             elif "rice" in text:
+                phrase = "amount of rice"
                 speak(f"{calc.water_to_rice(converter.get_number_and_unit(text))}")
             elif "what" in text:
+                phrase = "time indication"
                 if "time" in text:
                     speak(timer.current_time())
                 elif "today's date" in text:
@@ -140,30 +158,36 @@ def main():
                 elif "week" in text:
                     speak(timer.current_week_number())
             elif "play" in text:
+                phrase = "play MP3"
                 if "obi-wan" in text:
                     sound_effects.play_mp3("Obi-Wan")
                 elif "game" in text:
+                    phrase = "start pc"
                     r.energy_threshold = 800
                     mac = os.environ["pc_mac_address"]
                     ip = os.environ["pc_ip_address"]
                     send_magic_packet(mac, ip_address=ip)
                     sound_effects.play_mp3("game_on")
             elif "adjust" in text:
+                phrase = "calibrating sound output"
                 if "audio" in text or "sound" in text:
                     sound_effects.adjust_sound(converter.get_number_int(text))
             elif "misunderstanding counter" in text:
+                phrase = "miss. counter"
                 if "reset" in text:
                     src.global_var.misunderstanding_counter = 0
                     speak("counter is now reset")
                 else:
                     speak(f"The counter is now: {src.global_var.misunderstanding_counter}")
             elif "light" in text or "turn" in text or "set" in text or "going to bed" in text:
+                phrase = "light"
                 if "computer" in text or "pc" in text:
+                    phrase = "start pc"
                     r.energy_threshold = 800
                     mac = os.environ["pc_mac_address"]
                     ip = os.environ["pc_ip_address"]
                     send_magic_packet(mac, ip_address=ip)
-                elif "night":
+                elif "night" in text:
                     value = converter.get_number_int(text)
                     if value < 0 or value > 100:
                         speak("invalid percentage")
@@ -174,6 +198,7 @@ def main():
                     t = threading.Thread(target=light.controlling_lights, args=(text,))
                     t.start()
             elif "calendar" in text:
+                phrase = "calendar"
                 cal_res = None
                 if "add" in text:
                     cal_res = calendar.add_event(text)
@@ -183,17 +208,31 @@ def main():
                 if cal_res is not None:
                     speak(cal_res)
             elif "joke" in text:
+                phrase = "telling a joke"
                 speak("what do you call a cow without legs")
                 time.sleep(2)
                 speak("ground beef")
             elif "please repeat" in text or "come again" in text or "sorry" in text:
+                phrase = "repeat of last sentence"
                 speak(src.global_var.get_global_var("last_answer"))
             elif "read" in text:
+                phrase = "reading notes"
                 if "usage report" in text:
-                    speak(read("usage_report"))
+                    pass#speak(read("usage_report"))
             elif "exit" in text:
+                write("usage_log","exit the program")
                 print("Exiting program...")
                 break
-            else:
-                write(text)
+            
+            new_date = timer.todays_date()
+
+            if new_date != old_date:
+                write("usage_log", f"Date: {new_date}")
+                src.global_var.set_global_var("todays_date", new_date)
+                old_date = new_date
+
+            if phrase is text:
+                phrase = "missing: " + text
+                
+            write("usage_log", phrase)
 main()
