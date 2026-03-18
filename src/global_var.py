@@ -38,6 +38,8 @@ def get_global_var(var):
     cur = con.cursor()
     raw_res = cur.execute("SELECT value FROM global_var WHERE title = ?", [var])
     res = raw_res.fetchone()
+    if res is None:
+        return
     return res[0]
 
 def set_global_var(text, var):
