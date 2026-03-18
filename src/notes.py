@@ -2,7 +2,7 @@ def write(file_name, text):
 	with open(f"{file_name}.txt", "a") as f:
 		f.write(text + "\n")
 
-def creat_usage_log():
+def create_usage_log():
 	file = "usage_log.txt"
 	confirmed_msg = []
 	missing_msg = []
@@ -65,5 +65,3 @@ def creat_usage_log():
 			f.write(f"\nMissing: {missing_msg[i]['missing_count']}\n")
 			for key, value in list(missing_msg[i].items())[:len(missing_msg[i])-1]:
 				f.write(f"{key}: {value}\n")
-
-creat_usage_log()
