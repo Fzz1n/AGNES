@@ -11,7 +11,7 @@ from src import calc
 from src import converter
 from src import timer
 from src.IoT import light, weather, calendar
-from src.notes import write, read
+from src.notes import write, create_usage_log
 
 def main():
     # create/update DB and save todays date in it
