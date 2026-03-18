@@ -98,7 +98,8 @@ def controlling_lights(command):
 	
 	elif "going to bed" in command:
 		controlling_lights("off living room")
-		controlling_lights(f"set bedroom to {get_global_var("night_light_level")}")
+		light_level = get_global_var("night_light_level")
+		controlling_lights(f"set bedroom to {light_level}")
 		speak("copy that")
 		time.sleep(5 * 60) # 5 min
 		controlling_lights("off bedroom")
