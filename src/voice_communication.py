@@ -36,6 +36,7 @@ def get_audio(r, source, lang):
             continue
         
         except sr.UnknownValueError:
+            DEAFAULT_ENERGY_THRESHOLD = src.global_var.get_global_var("default_energy_threshold")
             src.global_var.misunderstanding_counter += 1
             miss_counter = src.global_var.misunderstanding_counter
             miss_timer = src.global_var.misunderstanding_timer
@@ -57,8 +58,8 @@ def get_audio(r, source, lang):
                 print("Resetting values")
                 src.global_var.misunderstanding_counter = 0
                 src.global_var.misunderstanding_timer = time_now
-                if r.energy_threshold == 700:
-                    r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
+                if r.energy_threshold == 700 or r.energy_threshold - 100 < DEAFAULT_ENERGY_THRESHOLD:
+                    r.energy_threshold = DEAFAULT_ENERGY_THRESHOLD
                 else:
                     r.energy_threshold -= 100
   
