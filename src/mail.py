@@ -11,18 +11,23 @@ SENDER_EMAIL = os.environ["sender_email"]
 PASSWORD = os.environ["sender_email_password"]
 RECIVER_EMAIL = os.environ["receiver_email"]
 
-message = MIMEMultipart()
-message['From'] = SENDER_EMAIL
-message['To'] = RECIVER_EMAIL
-message['Subject'] = 'Test Email'
+def send_email(title, body):
+    message = MIMEMultipart()
+    message["From"] = SENDER_EMAIL
+    message["To"] = RECIVER_EMAIL
+    message["Subject"] = title
 
-# Creation of mail body
-body = 'This is a test email sent from Python.'
-message.attach(MIMEText(body, 'plain'))
+    # Creation of mail body
+    message.attach(MIMEText(body, 'plain'))
 
-# Send the mail
-server = smtplib.SMTP(SMTP_SERVER, PORT)
-server.starttls()
-server.login(SENDER_EMAIL, PASSWORD)
-server.send_message(message)
-server.quit()
+    # Send the mail
+    try:
+        server = smtplib.SMTP(SMTP_SERVER, PORT)
+        server.starttls()
+        server.login(SENDER_EMAIL, PASSWORD)
+        server.send_message(message)
+        server.quit()
+    except:
+        return "An error accure when trying to send a email"
+    else:
+        return "Email send"
