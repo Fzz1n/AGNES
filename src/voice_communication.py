@@ -70,3 +70,7 @@ def get_audio(r, source, lang):
             print("Google API error:", e)
             speak("Google API error. Try again later")
             continue
+        
+        except:
+            print("Uninspected error")
+            return
