@@ -9,7 +9,6 @@ def string_to_int(s):
         num = int(s)
         return num
     except ValueError:
-        #print("Invalid input: cannot convert to integer")
         return ""
     
 def string_to_float(s):
@@ -17,7 +16,6 @@ def string_to_float(s):
         num = float(s)
         return num
     except ValueError:
-        #print("Invalid input: cannot convert to integer")
         return ""
 
 def get_number_int(text):
