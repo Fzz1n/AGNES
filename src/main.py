@@ -2,6 +2,7 @@ import os
 import time
 import threading
 import speech_recognition as sr
+import schedule
 
 from src.voice_communication import speak, get_audio
 from wakeonlan import send_magic_packet
@@ -11,7 +12,7 @@ from src import calc
 from src import converter
 from src import timer
 from src.IoT import light, weather, calendar
-from src.notes import write, create_usage_log
+from src.notes import write, send_note
 
 def main():
     # create/update DB and save todays date in it
@@ -36,6 +37,7 @@ def main():
             if text is None:
                 continue
             phrase = text
+            schedule.run_pending()
 
             if "69" in text:
                 sound_effects.play_mp3("nice_meme")
@@ -215,10 +217,11 @@ def main():
             elif "please repeat" in text or "come again" in text or "sorry" in text:
                 phrase = "repeat of last sentence"
                 speak(src.global_var.get_global_var("last_answer"))
-            elif "read" in text:
+            elif "send" in text:
                 phrase = "reading notes"
                 if "usage report" in text:
-                    pass#speak(read("usage_report"))
+                    t = threading.Thread(target=send_note)
+                    t.start()
             elif "exit" in text:
                 write("usage_log","exit the program")
                 print("Exiting program...")

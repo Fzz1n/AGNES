@@ -8,6 +8,7 @@ __pycache__/
 *.json
 *.db
 *.txt
+.usage_report/
 
 # Except the following files
 !requirements.txt

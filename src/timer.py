@@ -41,8 +41,12 @@ def current_month_name():
     return time.strftime("%B")
 
 # Get this week number
-def current_week_number():
-    return time.strftime("%V")
+def current_week_number(weeks_ahead = 0):
+    return (datetime.date.today() + datetime.timedelta(weeks=weeks_ahead)).strftime('%V')
+
+# Get current year
+def current_year():
+    return time.strftime("%Y")
 
 # Get the next date based on a week day name
 def next_date_by_weekday(target_weekday: int):
@@ -64,3 +68,9 @@ def older_than_x_days(start_time, max_age):
     
     # Max x days old
     return diff_days > max_age
+
+# Get start- and end-date of a week, by year and week number
+def get_date_range_from_week(p_year,p_week):
+    first_day_of_week = datetime.datetime.strptime(f'{p_year}-W{int(p_week )- 1}-1', "%Y-W%W-%w").date()
+    last_day_of_week = first_day_of_week + datetime.timedelta(days=6.9)
+    return first_day_of_week.strftime("%d-%m-%Y"), last_day_of_week.strftime("%d-%m-%Y")
