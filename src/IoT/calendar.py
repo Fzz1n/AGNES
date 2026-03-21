@@ -4,7 +4,7 @@ import os.path
 from src.global_var import WEEKSDAY_NAME
 import src.converter
 import src.timer
-from src.voice_communication import speak
+from src import voice_communication
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -142,7 +142,7 @@ def calendar_output(events, specific_date):
 			event_info += f", {start_t}-{end_t}"
 		
 		#print(event_info)
-		speak(event_info)
+		voice_communication.speak(event_info)
 
 # 
 def lookup_event(text):

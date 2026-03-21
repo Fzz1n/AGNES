@@ -2,19 +2,17 @@ import time
 import datetime
 import threading
 
-import src.global_var
-from src import sound_effects
-from src import converter
+from src import global_var, sound_effects, converter
 
 def countdown(t):
-    while t and not src.global_var.stop_event.is_set():
+    while t and not global_var.stop_event.is_set():
         mins, secs = divmod(t, 60)
         timer = '{:02d}:{:02d}'.format(mins, secs)
         print(timer, end='\r')  # Overwrite the line each second
         time.sleep(1)
         t -= 1
-        src.global_var.time_left = t
-    if not src.global_var.stop_event.is_set():
+        global_var.time_left = t
+    if not global_var.stop_event.is_set():
         sound_effects.play_mp3("alarms/classic_alarm")
 
 def start_timer(text):

@@ -1,9 +1,8 @@
 import datetime
-import time
 import re
 from dateutil import relativedelta
 
-from src.global_var import MONTHS
+from src import global_var
 
 def string_to_int(s):
     try:
@@ -79,7 +78,7 @@ def convert_seconds(sec):
     return "{:2d} sec".format(seconds)
 
 def get_date(text):
-    month_in_text = [month for month in MONTHS if month in text]
+    month_in_text = [month for month in global_var.MONTHS if month in text]
 
     # Year
     year = datetime.date.today().year
@@ -89,7 +88,7 @@ def get_date(text):
     # Month
     if not len(month_in_text):
         return "A month is missing."
-    month_num = MONTHS.index(month_in_text[0]) + 1
+    month_num = global_var.MONTHS.index(month_in_text[0]) + 1
 
     # Date
     match = re.findall(r"(?<![:\d])\d+(?![:\d])", text)
@@ -113,7 +112,7 @@ def get_date(text):
         # Check if the sec_num is smaller, when set the sec_num in next month 
         if int(first_num) > int(sec_num):
             # End of the year? Switch month and year
-            if month_num == (MONTHS.index("december") + 1):
+            if month_num == (global_var.MONTHS.index("december") + 1):
                 year += 1
                 month_num = 1
             else:

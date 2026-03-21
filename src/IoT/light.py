@@ -5,10 +5,7 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.voice_communication import speak
-from src import calc
-from src import converter
-from src.global_var import get_global_var
+from src import calc, converter, global_var, voice_communication
 
 # Golden webpage to "Get started": https://developers.meethue.com/develop/get-started-2/
 USERNAME = os.environ["hue_username"]
@@ -81,7 +78,7 @@ def get_status(url):
 
 # Help function for retunning an erro message
 def error_msg(text):
-    speak(text)
+    voice_communication.speak(text)
     return text
 
 # Creation of the API route
@@ -93,14 +90,14 @@ def controlling_lights(command):
 	if "kill" in command or "everything off" in command:
 		controlling_lights("off living room")
 		controlling_lights("off bedroom")
-		speak("copy that")
+		voice_communication.speak("copy that")
 		return
 	
 	elif "going to bed" in command:
 		controlling_lights("off living room")
-		light_level = get_global_var("night_light_level")
+		light_level = global_var.get_global_var("night_light_level")
 		controlling_lights(f"set bedroom to {light_level}")
-		speak("copy that")
+		voice_communication.speak("copy that")
 		time.sleep(5 * 60) # 5 min
 		controlling_lights("off bedroom")
 		return
@@ -123,14 +120,14 @@ def controlling_lights(command):
 		light_level = get_status(url)
 		if light_level is None:
 			return error_msg("No info was found")
-		speak(f"The light level is set to: {light_level}%")
+		voice_communication.speak(f"The light level is set to: {light_level}%")
 		return
 
 	# Create and validate the body
 	body = create_body(command)
 	if isinstance(body, str) or body is None:
 		if body is not None:
-			speak(body)
+			voice_communication.speak(body)
 			return
 		else:
 			return error_msg("Invalid execution of body")
@@ -140,7 +137,7 @@ def controlling_lights(command):
 		r = requests.put(url, json.dumps(body), timeout=5)
 	except:
 		print("Error: make sure the correct information are inserted in the .env")
-		speak("PUT error. Try again later")
+		voice_communication.speak("PUT error. Try again later")
 
 	response = r.json()
 	if isinstance(response, list) and "success" in response[0]:

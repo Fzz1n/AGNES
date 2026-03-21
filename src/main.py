@@ -3,29 +3,24 @@ import time
 import threading
 import speech_recognition as sr
 import schedule
+from wakeonlan import send_magic_packet
 
 from src.voice_communication import speak, get_audio
-from wakeonlan import send_magic_packet
-import src.global_var
-from src import sound_effects
-from src import calc
-from src import converter
-from src import timer
 from src.IoT import light, weather, calendar
-from src.notes import write, send_note
+from src import global_var, sound_effects, calc, converter, timer, notes
 
 def main():
     # create/update DB and save todays date in it
-    old_date = src.global_var.get_global_var("todays_date")
+    old_date = global_var.get_global_var("todays_date")
 
     if old_date is None:
-        src.global_var.set_global_var("todays_date", timer.todays_date())
+        global_var.set_global_var("todays_date", timer.todays_date())
 
     # Set up microphone settings
     r = sr.Recognizer()
     r.pause_threshold = 1.0 
     r.dynamic_energy_threshold = False
-    r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
+    r.energy_threshold = global_var.get_global_var("default_energy_threshold")
     
     with sr.Microphone() as source:
         print("Energy threshold:", r.energy_threshold)
@@ -63,7 +58,7 @@ def main():
                     else:
                         msg = f"energy threshold is now changed to: {number}"
                         if "default" in text:
-                            src.global_var.set_global_var("default_energy_threshold", number)
+                            global_var.set_global_var("default_energy_threshold", number)
                             msg = "default " + msg
                         else:
                             r.energy_threshold = number
@@ -72,7 +67,7 @@ def main():
                     speak(f"{round(r.energy_threshold, 2)}")
                 elif "deactivate dynamic" in text:
                     r.dynamic_energy_threshold = False
-                    r.energy_threshold = src.global_var.get_global_var("default_energy_threshold")
+                    r.energy_threshold = global_var.get_global_var("default_energy_threshold")
                     speak("dynamic energy threshold is now deactivated")
                 elif "activate dynamic" in text:
                     r.dynamic_energy_threshold = True
@@ -80,21 +75,21 @@ def main():
             elif "deactivate microphone" in text:
                 phrase = "microphone"
                 speak("copy that")
-                if src.global_var.stop_event.is_set():
-                    src.global_var.stop_event.clear()
+                if global_var.stop_event.is_set():
+                    global_var.stop_event.clear()
                 timer.start_timer(text)
                 speak("I'm back bitches!!")
             elif "time" in text:
                 phrase = "timer countdown"
                 if "left" in text:
-                    sec = src.global_var.time_left
+                    sec = global_var.time_left
                     speak(converter.convert_seconds(sec))
                 elif "stop" in text or "reset" in text:
-                    src.global_var.stop_event.set()
+                    global_var.stop_event.set()
                     speak("Time stopped")
                 else:
-                    if src.global_var.stop_event.is_set():
-                        src.global_var.stop_event.clear()
+                    if global_var.stop_event.is_set():
+                        global_var.stop_event.clear()
                     speak("copy that")
                     t = threading.Thread(target=timer.start_timer, args=(text,))
                     t.start()
@@ -177,10 +172,10 @@ def main():
             elif "misunderstanding counter" in text:
                 phrase = "miss. counter"
                 if "reset" in text:
-                    src.global_var.misunderstanding_counter = 0
+                    global_var.misunderstanding_counter = 0
                     speak("counter is now reset")
                 else:
-                    speak(f"The counter is now: {src.global_var.misunderstanding_counter}")
+                    speak(f"The counter is now: {global_var.misunderstanding_counter}")
             elif "light" in text or "turn" in text or "set" in text or "going to bed" in text:
                 phrase = "light"
                 if "computer" in text or "pc" in text:
@@ -194,7 +189,7 @@ def main():
                     if value < 0 or value > 100:
                         speak("invalid percentage")
                     else:
-                        src.global_var.set_global_var("night_light_level", value)
+                        global_var.set_global_var("night_light_level", value)
                         speak("changed is confirmed")
                 else:
                     t = threading.Thread(target=light.controlling_lights, args=(text,))
@@ -216,26 +211,26 @@ def main():
                 speak("ground beef")
             elif "please repeat" in text or "come again" in text or "sorry" in text:
                 phrase = "repeat of last sentence"
-                speak(src.global_var.get_global_var("last_answer"))
+                speak(global_var.get_global_var("last_answer"))
             elif "send" in text:
                 phrase = "reading notes"
                 if "usage report" in text:
-                    t = threading.Thread(target=send_note)
+                    t = threading.Thread(target=notes.send_note)
                     t.start()
             elif "exit" in text:
-                write("usage_log","exit the program")
+                notes.write("usage_log","exit the program")
                 print("Exiting program...")
                 break
             
             new_date = timer.todays_date()
 
             if new_date != old_date:
-                write("usage_log", f"Date: {new_date}")
-                src.global_var.set_global_var("todays_date", new_date)
+                notes.write("usage_log", f"Date: {new_date}")
+                global_var.set_global_var("todays_date", new_date)
                 old_date = new_date
 
             if phrase is text:
                 phrase = "missing: " + text
                 
-            write("usage_log", phrase)
+            notes.write("usage_log", phrase)
 main()

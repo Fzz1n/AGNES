@@ -4,8 +4,7 @@ import requests_cache
 from retry_requests import retry
 from ast import literal_eval
 
-from src import timer
-from src.global_var import WEEKSDAY_NAME, get_global_var, set_global_var
+from src import timer, global_var
 
 # Diff. api req: https://open-meteo.com/en/docs
 
@@ -88,26 +87,26 @@ def get_current_gps_coordinates():
 
 # Collectiong the nessary weather data 
 def weather_station():
-    coordinates = get_global_var("coordinates")
+    coordinates = global_var.get_global_var("coordinates")
     if coordinates is None:
         coordinates = get_current_gps_coordinates()
         if coordinates is None:
             return "Unable to retrieve your GPS coordinates."
         else:
-            set_global_var("coordinates", str(coordinates))
+            global_var.set_global_var("coordinates", str(coordinates))
     else:
         print(f"Using old coordinates: {coordinates}")
         coordinates = literal_eval(coordinates)
     latitude, longitude = coordinates
     
-    weather_data = get_global_var("weather_data")
-    if weather_data is None or timer.older_than_x_days(get_global_var("weather_data_age"), 3): # max 3 days
+    weather_data = global_var.get_global_var("weather_data")
+    if weather_data is None or timer.older_than_x_days(global_var.get_global_var("weather_data_age"), 3): # max 3 days
         print("Finding new weather data")
         weather_data = get_weather_data(latitude, longitude)
         if weather_data is None:
             return "Unable to receive weather data."
-        set_global_var("weather_data", str(weather_data))
-        set_global_var("weather_data_age", timer.current_time_sec())
+        global_var.set_global_var("weather_data", str(weather_data))
+        global_var.set_global_var("weather_data_age", timer.current_time_sec())
     else:
         print("Using old wather data")
         weather_data = literal_eval(weather_data)
@@ -142,7 +141,7 @@ def lookup_weather(text):
         return weather_forcast(weather_by_day[tomorrow], "tomorrow")
     else:
         # Weather on a inserted weekday
-        for week_day in WEEKSDAY_NAME:
+        for week_day in global_var.WEEKSDAY_NAME:
             if week_day in text and week_day in weather_by_day:
                 return weather_forcast(weather_by_day[week_day], week_day)
                 
