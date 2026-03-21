@@ -1,6 +1,6 @@
 import os
-from src import timer
-from src import mail
+from collections import defaultdict
+from src import timer, mail
 
 def write(file_name, text):
 	with open(f"{file_name}.txt", "a") as f:
@@ -9,14 +9,13 @@ def write(file_name, text):
 def create_usage_report(year, week_no):
 	firstdate, lastdate =  timer.get_date_range_from_week(year, week_no)
 	file = "usage_log.txt"
+	
 	confirmed_msg = []
 	missing_msg = []
-	day_confirmed_msg = {}
-	day_missing_msg = {}
-	missed_count = 0
-	confirmed_count = 0
-	found_first_date = False
 	del_indexes = []
+	current_confirmed = None
+	current_missing = None
+
 	with open(file) as f:
 		for index, line_n in enumerate(f):
 			line = line_n.strip()
@@ -27,54 +26,44 @@ def create_usage_report(year, week_no):
 				if date >= lastdate:
 					break
 
-				if date >= firstdate and date <= lastdate:
-					found_first_date = True
-				else:
-					continue
-
-				if len(day_confirmed_msg) and len(day_missing_msg):
-					day_confirmed_msg["confirmed_count"] = confirmed_count
-					day_missing_msg["missing_count"] = missed_count
-					confirmed_msg.append(day_confirmed_msg)
-					missing_msg.append(day_missing_msg)
-				day_confirmed_msg = {f"date": date}
-				day_missing_msg = {}
-				missed_count = 0
-				confirmed_count = 0
+				if not (firstdate <= date <= lastdate):
+					continue					
 				
+				# Save previous day
+				if current_confirmed:
+					confirmed_msg.append(current_confirmed)
+					missing_msg.append(current_missing)
+				
+				# Create new day
+				current_confirmed = {
+					"date": date,
+					"data": defaultdict(int),
+                	"count": 0
+				}
+				current_missing = {
+					"data": defaultdict(int),
+                	"count": 0
+				}
+				
+				# Save index line for later delete
 				del_indexes.append(index)
 
-			elif line.startswith("missing: ") and found_first_date:
-				# Remove missing from the begining of the string
-				missed_info = line.replace("missing: ", "")
-				missed_count += 1
-				
-				if len(day_missing_msg) == 0:
-					day_missing_msg[f"{missed_info}"] = 1
-
+			elif current_confirmed:
+				if line.startswith("missing: "):
+					msg = line.replace("missing: ", "")
+					current_missing["data"][msg] += 1
+					current_missing["count"] += 1
 				else:
-					if missed_info in day_missing_msg:
-						day_missing_msg[f"{missed_info}"] += 1
-					else:
-						day_missing_msg[f"{missed_info}"] = 1
+					current_confirmed["data"][line] += 1
+					current_confirmed["count"] += 1
 				
-				del_indexes.append(index)
-
-			elif found_first_date:
-				confirmed_count += 1
-				if line in day_confirmed_msg:
-					day_confirmed_msg[f"{line}"] += 1
-				else:
-					day_confirmed_msg[f"{line}"] = 1
-				
+				# Save index line for later delete
 				del_indexes.append(index)
 	
-	day_confirmed_msg["confirmed_count"] = confirmed_count
-	day_missing_msg["missing_count"] = missed_count
-	confirmed_msg.append(day_confirmed_msg)
-	missing_msg.append(day_missing_msg)
-
-	if not found_first_date:
+	if current_confirmed:
+		confirmed_msg.append(current_confirmed)
+		missing_msg.append(current_missing)
+	else:
 		return "Didn't found any logs"
 	
 	# Deleting the lines
@@ -85,55 +74,57 @@ def create_usage_report(year, week_no):
 			if i not in del_indexes:
 				f.write(line)
 
+	# Calc sum msg
+	all_confirmed_msg = {
+		"data": defaultdict(int),
+        "count": 0
+	}
+	all_missing_msg = {
+		"data": defaultdict(int),
+        "count": 0
+	}
+	
+	# Confirmed messages
+	for day in confirmed_msg:
+		all_confirmed_msg["count"] += day["count"]
+		for key, value in day["data"].items():
+			all_confirmed_msg["data"][key] += value
+
+	# Missing messages
+	for day in missing_msg:
+		all_missing_msg["count"] += day["count"]
+		for key, value in day["data"].items():
+			all_missing_msg["data"][key] += value
+	
+	# Create directory
 	report_path = f".usage_report/{year}/"
 	create_dir(report_path)
 
 	# Write the usage report
-	found_first_date = False
 	with open(f"{report_path}usage_report_week-{week_no}-{year}.txt", "w") as f:
-		all_confirmed_msg = {}
-		all_missing_msg = {}
-		# Calc sum msg
-		for i in range(len(confirmed_msg)):
-			# Confirmed messages
-			for key, value in list(confirmed_msg[i].items())[1:]:
-				if key in all_confirmed_msg:
-					all_confirmed_msg[f"{key}"] += value
-				else:
-					all_confirmed_msg[f"{key}"] = value
-			
-			# Missing messages
-			for key, value in missing_msg[i].items():
-				if key in all_missing_msg:
-					all_missing_msg[f"{key}"] += value
-				else:
-					all_missing_msg[f"{key}"] = value
-
 		# Total sum
 		f.write(f"Total in week {week_no}\n")
-		f.write(f"\nConfirmed: {all_confirmed_msg['confirmed_count']}\n")
-		del all_confirmed_msg['confirmed_count']
-		for key, value in all_confirmed_msg.items():
-			f.write(f"{key}: {value}\n")
-		f.write(f"\nMissing: {all_missing_msg['missing_count']}\n")
-		del all_missing_msg['missing_count']
-		for key, value in all_missing_msg.items():
-			f.write(f"{key}: {value}\n")
-		
+		write_c_and_m(f, all_confirmed_msg, all_missing_msg)		
 
-		for i in range(len(confirmed_msg)):			
+		# Each day
+		for i in range(len(confirmed_msg)):
 			# Date
 			f.write(f"\n\nDate: {confirmed_msg[i]['date']}")
-			
-			# Confirmed messages
-			f.write(f"\nConfirmed: {confirmed_msg[i]['confirmed_count']}\n")
-			for key, value in list(confirmed_msg[i].items())[1:len(confirmed_msg[i])-1]:
-				f.write(f"{key}: {value}\n")
-			
-			# Missing messages
-			f.write(f"\nMissing: {missing_msg[i]['missing_count']}\n")
-			for key, value in list(missing_msg[i].items())[:len(missing_msg[i])-1]:
-				f.write(f"{key}: {value}\n")
+
+			# Write Confirmed and Missing in file
+			write_c_and_m(f, confirmed_msg[i], missing_msg[i])
+
+# Write Confirmed and Missing object in a file
+def write_c_and_m(file, conf, miss):
+	# Confirmed messages
+	file.write(f"\nConfirmed: {conf['count']}\n")
+	for key, value in conf["data"].items():
+		file.write(f"{key}: {value}\n")
+	
+	# Missing messages
+	file.write(f"\nMissing: {miss['count']}\n")
+	for key, value in miss["data"].items():
+		file.write(f"{key}: {value}\n")
 
 # Make a new directory
 def create_dir(path):
@@ -163,5 +154,3 @@ def send_note():
 		res = mail.send_email(title, file_path=file)
 		if isinstance(res, str):
 			print(res)
-		else:
-			print
