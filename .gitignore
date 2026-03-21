@@ -9,6 +9,7 @@ __pycache__/
 *.db
 *.txt
 .usage_report/
+voice.mp3
 
 # Except the following files
 !requirements.txt
