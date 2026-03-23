@@ -4,6 +4,8 @@ import json
 import time
 from dotenv import load_dotenv
 load_dotenv()
+import ast
+from collections import defaultdict
 
 from src import calc, converter, global_var, voice_communication
 
@@ -38,22 +40,42 @@ def create_body(command):
 		return {"alert":"lselect"}
 	return
 
-# The diffrent rooms on the HUE
-def get_rooms_no(text):
-	if "living" in text:
-		return 81
-	if "bed" in text:
-		return 82
-	return
+# Auto gets and store the room and light sources
+def get_light_or_room(text):
+	light_data = global_var.get_global_var("light_data")
 	
-# The diffrent connected sorces on the HUE
-def deff_single_source(text):
-	if "floor lamp" in text:
-		return 1
-	elif "dining table" in text:
-		return 2
-	elif "bed" in text:
-		return 3
+	# Using old data if it exist
+	if light_data:
+		print("Using old light data")
+		light_data = ast.literal_eval(light_data)
+	else:
+		# Getting new data soruces
+		r = requests.get(f"{REST_API}", timeout=5)
+		response = r.json()
+		light_data = {
+			"rooms": {},
+			"lights": {}
+		}
+
+		# Finding rooms
+		for room_no, data in response["groups"].items():
+			if data["type"] == "Room":
+				light_data["rooms"][data["name"].lower()] = room_no
+	
+		# Finding lights
+		for light_no, data in response["lights"].items():
+			if data["type"] == "Dimmable light":
+				light_data["lights"][data["name"].lower()] = light_no
+
+		if light_data is None:
+			return
+		# Save in DB
+		global_var.set_global_var("light_data", str(light_data))
+
+	# Find the soruce and return if it exist
+	number = [n for location, data in light_data.items() for source, n in data.items() if source in text]
+	if number:
+		return int(number[0])
 	return
 
 def get_status(url):
@@ -103,14 +125,14 @@ def controlling_lights(command):
 		return
 
 	elif "room" in command:
-		room_number = get_rooms_no(command)
+		room_number = get_light_or_room(command)
 		if room_number is None:
 			return error_msg("the room doesn't exist")
 		url = f"{REST_API}groups/{room_number}/action"
 
 	else:
 		# The input is a spesafic source or invalid 
-		number = deff_single_source(command)
+		number = get_light_or_room(command)
 		if number is None:
 			return error_msg("Not a valid source")
 		url = f"{REST_API}lights/{number}/state"
