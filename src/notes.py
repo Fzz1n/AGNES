@@ -6,8 +6,9 @@ def write(file_name, text):
 	with open(f"{file_name}.txt", "a") as f:
 		f.write(text + "\n")
 
+# Creation og usage reports
 def create_usage_report(year, week_no):
-	firstdate, lastdate =  timer.get_date_range_from_week(year, week_no)
+	firstdate, lastdate =  timer.get_date_range_from_week(year, week_no) # get start- and end-date in the week's range
 	file = "usage_log.txt"
 	
 	confirmed_msg = []
@@ -16,10 +17,12 @@ def create_usage_report(year, week_no):
 	current_confirmed = None
 	current_missing = None
 
+	# Open usage_log and goes through each line
 	with open(file) as f:
 		for index, line_n in enumerate(f):
 			line = line_n.strip()
 
+			# line starts with 'Date: '
 			if line.startswith("Date: "):
 				date = line.replace("Date: ", "")
 				
@@ -27,7 +30,7 @@ def create_usage_report(year, week_no):
 					break
 
 				if not (firstdate <= date <= lastdate):
-					continue					
+					continue
 				
 				# Save previous day
 				if current_confirmed:
@@ -48,7 +51,9 @@ def create_usage_report(year, week_no):
 				# Save index line for later delete
 				del_indexes.append(index)
 
+			# If a new day is created, save teh following lines
 			elif current_confirmed:
+				# Separate the 'valid' input from the 'missing/unvaild'
 				if line.startswith("missing: "):
 					msg = line.replace("missing: ", "")
 					current_missing["data"][msg] += 1
@@ -60,6 +65,7 @@ def create_usage_report(year, week_no):
 				# Save index line for later delete
 				del_indexes.append(index)
 	
+	# Save the list data, if empty return 'no logs found'
 	if current_confirmed:
 		confirmed_msg.append(current_confirmed)
 		missing_msg.append(current_missing)
@@ -139,6 +145,7 @@ def create_dir(path):
 	except Exception as e:
 		print(f"An error occurred: {e}")
 
+# Creates/update usage_report and send it
 def send_note():
 	year = timer.current_year() 
 	week_now = timer.current_week_number()
@@ -150,6 +157,7 @@ def send_note():
 	if isinstance(res, str):
 		print(res)
 	else:
+		# Send data to mail
 		title = f"Week {week_past} usage report"
 		file = f".usage_report/{year}/usage_report_week-{week_past}-{year}.txt"
 		res = mail.send_email(title, file_path=file)

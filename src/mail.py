@@ -13,6 +13,7 @@ SENDER_EMAIL = os.environ["sender_email"]
 PASSWORD = os.environ["sender_email_password"]
 RECIVER_EMAIL = os.environ["receiver_email"]
 
+# Email sender
 def send_email(title, body = "", file_path = None):
     message = MIMEMultipart()
     message["From"] = SENDER_EMAIL

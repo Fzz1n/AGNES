@@ -1,7 +1,9 @@
 import platform
 import subprocess
 
+# Adjusting the sound depending on platform (Linux or Windows)
 def adjust_sound(volume):
+    # Making sure it's between 0 and 100%
     if not 0 <= volume <= 100:
         return "Not a valid input"
 
@@ -16,6 +18,7 @@ def adjust_sound(volume):
 
     return f"The volume is set to {volume}"
 
+#  Plays MP3 files, dependign on platfrom (Linux or Windows)
 def play_mp3(soundname):
     filename = f"src/mp3_files/{soundname}.mp3"
     system = platform.system()

@@ -34,6 +34,7 @@ def create_db():
             con.close()
             print("the sqlite connection is closed")
 
+# Getting value from db
 def get_global_var(var):
     con = sqlite3.connect("agnes.db")
     cur = con.cursor()
@@ -43,6 +44,7 @@ def get_global_var(var):
         return
     return res[0]
 
+# Chnage value in db
 def set_global_var(text, var):
     con = sqlite3.connect("agnes.db")
     cur = con.cursor()

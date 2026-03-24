@@ -4,6 +4,7 @@ import threading
 
 from src import global_var, sound_effects, converter
 
+# Timer/Countdown
 def countdown(t):
     while t and not global_var.stop_event.is_set():
         mins, secs = divmod(t, 60)
@@ -15,6 +16,7 @@ def countdown(t):
     if not global_var.stop_event.is_set():
         sound_effects.play_mp3("alarms/classic_alarm")
 
+# Start of timer/countdown
 def start_timer(text):
     countdown(converter.get_time(text))
 

@@ -10,7 +10,7 @@ from src.IoT import light, weather, calendar
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
 
 def main():
-    # create/update DB and save todays date in it
+    # create/update DB and save todays date in it + start schedules
     old_date = global_var.get_global_var("todays_date")
     schedules.jobs()
 
@@ -225,13 +225,16 @@ def main():
             
             new_date = timer.todays_date()
 
+            # Making a new day in the usage_log, and save current date in DB
             if new_date != old_date:
                 notes.write("usage_log", f"Date: {new_date}")
                 global_var.set_global_var("todays_date", new_date)
                 old_date = new_date
 
+            # Add 'missing: ' in the begining of the text, for easer sorting usage_log
             if phrase is text:
                 phrase = "missing: " + text
-                
+            
+            # Write to the usage_log file
             notes.write("usage_log", phrase)
 main()

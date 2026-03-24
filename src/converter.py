@@ -93,11 +93,13 @@ def get_date(text):
     if not match:
         return "A date is missing."
 
+    # Making sure it a valid date between 1-31
     first_num = match[0]
     if int(first_num) > 31 or int(first_num) < 1:
         print("invalid")
         return "The date is invalid."
     
+    # Validate date
     try:
         first_date = datetime.datetime(int(year), int(month_num), int(first_num)).date()
     except:
@@ -115,13 +117,16 @@ def get_date(text):
                 month_num = 1
             else:
                 month_num += 1
+        # Create second date
         try:
             sec_date = datetime.datetime(int(year), int(month_num), int(sec_num)).date()
         except:
             return "Not a valid date."
         
+        # Return the first and second date
         return [first_date, sec_date]
     
+    # Only return the first
     return first_date
 
 def get_clock(text):
