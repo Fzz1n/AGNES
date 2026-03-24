@@ -11,6 +11,7 @@ from src import global_var, schedules, sound_effects, calc, converter, timer, no
 
 def main():
     # create/update DB and save todays date in it + start schedules
+    global_var.create_db()
     old_date = global_var.get_global_var("todays_date")
     schedules.jobs()
 

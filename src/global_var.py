@@ -50,4 +50,3 @@ def set_global_var(text, var):
     cur = con.cursor()
     cur.execute("UPDATE global_var SET value = ? WHERE title = ?", [var, text])
     con.commit()
-create_db()
