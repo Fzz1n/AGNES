@@ -1,3 +1,4 @@
+import os
 import geocoder
 import openmeteo_requests
 import requests_cache
@@ -13,6 +14,7 @@ def get_weather_data(lat, lon):
     cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
     retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
     openmeteo = openmeteo_requests.Client(session = retry_session)
+    TIMEZONE = os.environ["timezone"]
 
     # Make sure all required weather variables are listed here
     # The order of variables in hourly or daily is important to assign them correctly below
@@ -30,7 +32,7 @@ def get_weather_data(lat, lon):
             "snowfall",                     # Snowfall (in mm)
             "rain"                          # Rain (in mm)
         ],
-        "timezone": "Europe/Berlin",
+        "timezone": TIMEZONE,
         "wind_speed_unit": "ms",
     }
     responses = openmeteo.weather_api(url, params=params)
