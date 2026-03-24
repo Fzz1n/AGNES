@@ -7,11 +7,12 @@ from wakeonlan import send_magic_packet
 
 from src.voice_communication import speak, get_audio
 from src.IoT import light, weather, calendar
-from src import global_var, sound_effects, calc, converter, timer, notes
+from src import global_var, schedules, sound_effects, calc, converter, timer, notes
 
 def main():
     # create/update DB and save todays date in it
     old_date = global_var.get_global_var("todays_date")
+    schedules.jobs()
 
     if old_date is None:
         global_var.set_global_var("todays_date", timer.todays_date())
@@ -28,11 +29,11 @@ def main():
         while True:
             # r.adjust_for_ambient_noise(source, duration=1) # auto calibrate sound    
             text = get_audio(r, source, "en-US")
-
+            schedule.run_pending()
+            
             if text is None:
                 continue
             phrase = text
-            schedule.run_pending()
 
             if "69" in text:
                 sound_effects.play_mp3("nice_meme")
