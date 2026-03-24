@@ -5,7 +5,6 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 import ast
-from collections import defaultdict
 
 from src import calc, converter, global_var, voice_communication
 
