@@ -66,13 +66,13 @@ def create_usage_report(year, week_no):
 	else:
 		return "Didn't found any logs"
 	
-	# Deleting the lines
+	'''# Deleting the lines
 	with open(file, "r") as f:
 		lines = f.readlines()
 	with open(file, "w") as f:
 		for i, line in enumerate(lines):
 			if i not in del_indexes:
-				f.write(line)
+				f.write(line)'''
 
 	# Calc sum msg
 	all_confirmed_msg = {
@@ -98,6 +98,7 @@ def create_usage_report(year, week_no):
 	
 	# Create directory
 	report_path = f".usage_report/{year}/"
+	create_dir(".usage_report")
 	create_dir(report_path)
 
 	# Write the usage report
