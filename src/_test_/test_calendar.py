@@ -1,4 +1,4 @@
-from src.IoT.calendar import add_event, lookup_event
+from src.external_services.calendar import add_event, lookup_event
 
 # Tests for adding event to the calendar
 create_event = "add to my calendar"

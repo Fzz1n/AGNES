@@ -1,4 +1,4 @@
-from src.mail import send_email
+from src.external_services.mail import send_email
 
 def test_send_email():
     title = "Title crerate by test"

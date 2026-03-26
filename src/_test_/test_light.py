@@ -1,4 +1,4 @@
-from src.IoT.light import controlling_lights
+from src.external_services.light import controlling_lights
 
 # Test for contoling the lights from Hue bridge
 def test_light_all_off():

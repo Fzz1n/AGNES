@@ -1,4 +1,4 @@
-from src.IoT.weather import lookup_weather
+from src.external_services.weather import lookup_weather
 
 # Test wather
 error_msg = "Couldn't find any weather projection"

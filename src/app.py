@@ -6,7 +6,7 @@ import schedule
 from wakeonlan import send_magic_packet
 
 from src.voice_communication import speak, get_audio
-from src.IoT import light, weather, calendar
+from src.external_services import light, weather, calendar
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
 
 def main():

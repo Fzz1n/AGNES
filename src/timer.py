@@ -1,6 +1,5 @@
 import time
 import datetime
-import threading
 
 from src import global_var, sound_effects, converter
 

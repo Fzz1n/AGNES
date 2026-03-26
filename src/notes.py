@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict
-from src import timer, mail
+from src import timer
+from src.external_services import mail
 
 def write(file_name, text):
 	with open(f"{file_name}.txt", "a") as f:
