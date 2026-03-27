@@ -90,11 +90,16 @@ def main():
                     global_var.stop_event.set()
                     speak("Time stopped")
                 else:
+                    # Reset event if set
                     if global_var.stop_event.is_set():
                         global_var.stop_event.clear()
-                    speak("copy that")
-                    t = threading.Thread(target=timer.start_timer, args=(text,))
-                    t.start()
+                    
+                    # Make sure a time is inserted, not e.g. 0 sec
+                    sec = converter.get_time(text)
+                    if sec:
+                        speak("copy that")
+                        t = threading.Thread(target=timer.countdown, args=(sec,))
+                        t.start()
             elif "weather" in text:
                 phrase = "weather"
                 speak(weather.lookup_weather(text))

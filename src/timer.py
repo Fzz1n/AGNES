@@ -15,10 +15,6 @@ def countdown(t):
     if not global_var.stop_event.is_set():
         sound_effects.play_mp3("alarms/classic_alarm")
 
-# Start of timer/countdown
-def start_timer(text):
-    countdown(converter.get_time(text))
-
 # Get now time in sec
 def current_time_sec():
     return time.time()
