@@ -47,7 +47,7 @@ def get_audio(r, source, lang):
             global_var.misunderstanding_timer = time_now
 
         # More than 20 misunderstandings and les than 5 min    
-        elif miss_counter >= 20 and (time_now - miss_timer) <= 300:
+        elif miss_counter >= 15 and (time_now - miss_timer) <= 300:
             r.energy_threshold += 50
             global_var.misunderstanding_counter = 0
             global_var.misunderstanding_timer = time_now
