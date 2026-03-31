@@ -79,7 +79,8 @@ def main():
                 speak("copy that")
                 if global_var.stop_event.is_set():
                     global_var.stop_event.clear()
-                timer.start_timer(text)
+                sec = converter.get_time(text)
+                timer.countdown(sec)
                 speak("I'm back bitches!!")
             elif "time" in text:
                 phrase = "timer countdown"
