@@ -51,10 +51,6 @@ def get_audio(r, source, lang):
             r.energy_threshold += 50
             global_var.misunderstanding_counter = 0
             global_var.misunderstanding_timer = time_now
-            msg = f"Upgrading energy threshold to {r.energy_threshold}"
-            print(msg)
-            if not r.energy_threshold > 500:
-                speak(msg)
         
         # Older whan 30 min
         elif (time_now - miss_timer) > (60 * 30):
@@ -73,7 +69,6 @@ def get_audio(r, source, lang):
     
     except sr.RequestError as e:
         print("Google API error:", e)
-        speak("Google API error. Try again later")
         return
     
     except:
