@@ -31,8 +31,7 @@ def main():
             # r.adjust_for_ambient_noise(source, duration=1) # auto calibrate sound    
             text = get_audio(r, source, "en-US")
             schedule.run_pending()
-            
-            if text is None:
+            if text is None or global_var.get_global_var("react_by_name") and "agnes" not in text:
                 continue
             phrase = text
 
@@ -51,6 +50,14 @@ def main():
             elif "who are you" in text:
                 phrase = "kazoo kid"
                 sound_effects.play_mp3("kazoo_kid")
+            elif "hands-free mode" in text:
+                phrase = "hands-free mode"
+                if "deactivate" in text:
+                    speak("remember to use my name when giving a command")
+                    global_var.set_global_var("react_by_name", True)
+                elif "activate":
+                    speak("give a command without using my name")
+                    global_var.set_global_var("react_by_name", False)
             elif "energy threshold" in text:
                 phrase = "energy threshold"
                 if "change" in text or "set" in text:

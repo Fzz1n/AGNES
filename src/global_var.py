@@ -22,7 +22,8 @@ def create_db():
             ("default_energy_threshold", 200),
             ("night_light_level", 30),
             ("todays_date", None),
-            ("light_data", None)
+            ("light_data", None),
+            ("react_by_name", True)
         ]
         cur.executemany("INSERT INTO global_var (title, value) VALUES (?, ?) ON CONFLICT(title) DO NOTHING", data)
         con.commit()
