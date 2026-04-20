@@ -32,13 +32,18 @@ def get_audio(r, source, lang, ET_deafault):
         # Calc. the energy threshold from audio
         data = audio.frame_data
         ET_live = audioop.rms(data, 2)
-        change_ET = None
         print(f"ET_live {ET_live}")
+        
+        MAX = ET_deafault * 3
+        MIN = ET_deafault * 0.8
+        # Check energy threshold of recording
+        if ET_live > MAX or ET_live < MIN:
+            print("Ignore command")
+            global_var.misunderstanding_counter += 1
+            return
         
         # Set energy threshold to 400 to avoid unassesary noize
         if global_var.misunderstanding_counter >= 10:
-            change_ET = 400
-
             miss_timer = global_var.misunderstanding_timer
             time_now = timer.current_time_sec()
             if miss_timer is None:
@@ -49,15 +54,10 @@ def get_audio(r, source, lang, ET_deafault):
                 global_var.misunderstanding_counter = 0
                 global_var.misunderstanding_timer = time_now
             else:
-                print(f"Speak up, dafault ET are: {ET_deafault}")
-        
-        MAX = ET_deafault * 3
-        MIN = change_ET if change_ET else ET_deafault * 0.8
-        # Check energy threshold of recording
-        if ET_live > MAX or ET_live < MIN:
-            print("Ignore command")
-            global_var.misunderstanding_counter += 1
-            return
+                MIN = 400 * 0.8
+                print(f"Speak up, dafault ET are: 400")
+                if ET_live < MIN:
+                    return
         
         said = r.recognize_google(audio, language=lang) # Danish -> da-DK || English(US) -> en-US
         print("You said:", said.lower())
