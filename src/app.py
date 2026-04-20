@@ -29,7 +29,7 @@ def main():
         
         while True:
             # r.adjust_for_ambient_noise(source, duration=1) # auto calibrate sound    
-            text = get_audio(r, source, "en-US")
+            text = get_audio(r, source, "en-US", r.energy_threshold)
             schedule.run_pending()
             if text is None or global_var.get_global_var("react_by_name") and "agnes" not in text:
                 continue
