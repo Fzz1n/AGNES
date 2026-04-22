@@ -5,7 +5,7 @@ import speech_recognition as sr
 import schedule
 from wakeonlan import send_magic_packet
 
-from external_services.iot.bridge import hue_light
+from external_services.iot import light
 from src.voice_communication import speak, get_audio
 from src.external_services import weather, calendar
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
@@ -208,7 +208,7 @@ def main():
                         global_var.set_global_var("night_light_level", value)
                         speak("changed is confirmed")
                 else:
-                    t = threading.Thread(target=hue_light.controlling_lights, args=(text,))
+                    t = threading.Thread(target=light.controlling_lights, args=(text,))
                     t.start()
             elif "calendar" in text:
                 phrase = "calendar"
