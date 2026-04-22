@@ -5,7 +5,7 @@ import speech_recognition as sr
 import schedule
 from wakeonlan import send_magic_packet
 
-from external_services.iot import light
+from src.external_services.iot import light
 from src.voice_communication import speak, get_audio
 from src.external_services import weather, calendar
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
