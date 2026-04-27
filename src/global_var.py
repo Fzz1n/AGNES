@@ -7,6 +7,7 @@ stop_event = threading.Event()
 misunderstanding_counter = 0
 misunderstanding_timer = None
 time_left = 0
+devices_current_values = {}
 
 # Creation of global_var DB
 def create_db():

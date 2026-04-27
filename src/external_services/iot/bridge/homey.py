@@ -54,3 +54,25 @@ def get_devices():
     global_var.set_global_var("iot_devices", str(devices))
     global_var.set_global_var("light_devices", str(lights))
     return lights, devices
+
+def get_status(url, device_name, get_value, time_interval=0):
+	headers = {"Authorization": f"Bearer {HOMEY_KEY}"}
+	while True:
+		try:
+			r = requests.get(url, headers=headers, timeout=5)
+			response = r.json()
+			value = response.get("capabilitiesObj", {}).get(get_value, {}).get("value")
+
+			old_value = global_var.devices_current_values.get(device_name, {}).get(get_value)
+			
+			if value != old_value:
+				print(f"[{device_name}] {get_value}: {value}")
+				global_var.devices_current_values[device_name] = {get_value: value, "timestamp": time.time()}
+			
+		except Exception as e:
+			print("GET error. Try again later", e)
+		finally:
+			time.sleep(time_interval)
+
+def get_current_value(device_name, capability):
+	return global_var.devices_current_values.get(device_name, {}).get(capability)
