@@ -5,6 +5,7 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 import ast
+import threading
 
 from src import calc, converter, global_var, voice_communication
 
@@ -74,5 +75,20 @@ def get_status(url, device_name, get_value, time_interval=0):
 		finally:
 			time.sleep(time_interval)
 
-def get_current_value(device_name, capability):
+def get_device_current_value(device_name, capability):
 	return global_var.devices_current_values.get(device_name, {}).get(capability)
+
+def update_status(device_data, devices):
+    threads = []
+    for device_name, config in devices.items():
+        device_id = device_data[device_name]["id"]
+        url = REST_API + f"devices/device/{device_id}"
+
+        thread = threading.Thread(
+            target = get_status,
+            args = (url, device_name, config["target_capability"], config["interval"]),
+            daemon = True
+        )
+        thread.start()
+        threads.append(thread)
+    return len(threads)

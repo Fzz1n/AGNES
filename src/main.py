@@ -252,4 +252,3 @@ def main():
             
             # Write to the usage_log file
             notes.write("usage_log", phrase)
-main()

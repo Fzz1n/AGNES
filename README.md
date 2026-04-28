@@ -83,7 +83,7 @@ pip install -r requirements.txt
 ### Running the app for the first time
 Connect your iOS device and start the program:
 ```bash
-python -m src.app
+python -m app
 ```
 
 ### Running tests
