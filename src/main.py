@@ -184,7 +184,7 @@ def main():
             elif "adjust" in text:
                 phrase = "calibrating sound output"
                 if "audio" in text or "sound" in text:
-                    sound_effects.adjust_sound(converter.get_number_int(text))
+                    sound_effects.adjust_volume(converter.get_number_int(text))
             elif "misunderstanding counter" in text:
                 phrase = "miss. counter"
                 if "reset" in text:
@@ -210,6 +210,11 @@ def main():
                 else:
                     t = threading.Thread(target=light.controlling_lights, args=(text,))
                     t.start()
+            elif "update iot devices" in text:
+                from src.external_services.iot.bridge.homey import get_devices
+                iot_devices = get_devices()
+                msg = "IOT devices are now updated" if iot_devices else "Error, updating IOT devices"
+                speak(msg)
             elif "calendar" in text:
                 phrase = "calendar"
                 cal_res = None
