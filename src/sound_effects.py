@@ -1,5 +1,4 @@
-import platform
-import subprocess
+import platform, subprocess, re
 
 # Adjusting the sound depending on platform (Linux or Windows)
 def adjust_volume(volume):
@@ -30,9 +29,16 @@ def current_volume():
         return int(volume_level)    
     
     elif system == "Linux":
-        import alsaaudio
-        mixer = alsaaudio.Mixer()
-        return int(mixer.getvolume()[0])
+        result = subprocess.run(
+            ["amixer", "-c", "2", "sget", "PCM"],
+            capture_output = True,
+            text = True,
+            check = True
+        )
+
+        match = re.search(r'\[(\d{1,3})%\]', result.stdout)
+        if match:
+            return int(match.group(1))
 
 #  Plays MP3 files, dependign on platfrom (Linux or Windows)
 def play_mp3(soundname):
