@@ -56,7 +56,18 @@ def get_devices():
     global_var.set_global_var("light_devices", str(lights))
     return lights, devices
 
-def get_status(url, device_name, get_value, time_interval=0):
+def get_status(device_id, get_value):
+    url = REST_API + f"devices/device/{device_id}"
+    headers = {"Authorization": f"Bearer {HOMEY_KEY}"}
+    try:
+        r = requests.get(url, headers=headers, timeout=5)
+        response = r.json()
+        return response.get("capabilitiesObj", {}).get(get_value, {}).get("value")
+    except Exception as e:
+        print("GET error. Try again later", e)
+        return
+
+def auto_get_status(url, device_name, get_value, time_interval=0):
 	headers = {"Authorization": f"Bearer {HOMEY_KEY}"}
 	while True:
 		try:
@@ -85,7 +96,7 @@ def update_status(device_data, devices):
         url = REST_API + f"devices/device/{device_id}"
 
         thread = threading.Thread(
-            target = get_status,
+            target = auto_get_status,
             args = (url, device_name, config["target_capability"], config["interval"]),
             daemon = True
         )

@@ -1,7 +1,7 @@
 import os, schedule, threading, ast
 from src import notes, global_var
 from src.external_services.iot.bridge.homey import get_devices
-from src.external_services.iot import magnetic_contacts, plugs, indoor_climate
+from src.external_services.iot import magnetic_contacts, indoor_climate
 from dotenv import load_dotenv
 load_dotenv()
 TIMEZONE = os.environ["timezone"]
@@ -21,7 +21,7 @@ def start_monetoring_devices():
 		devices_data = global_var.get_global_var("iot_devices")
 	devices_data = ast.literal_eval(devices_data)
 
-	devices_to_watch = [indoor_climate.thermometers, plugs.plugs, magnetic_contacts.manget_contacts]
+	devices_to_watch = [indoor_climate.thermometers, magnetic_contacts.manget_contacts]
 	for monitor_device in devices_to_watch:
 		threads = threading.Thread(
 			target = monitor_device,

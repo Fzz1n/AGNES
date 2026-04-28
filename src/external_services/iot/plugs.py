@@ -1,9 +1,12 @@
+import ast
+from src import global_var
+from src.external_services.iot.bridge.homey import get_status
+devices_data = ast.literal_eval(global_var.get_global_var("iot_devices"))
+PLUG_DATA = devices_data["plug"]
+PLUG_DATA_ID = PLUG_DATA["id"]
 
-def plugs(device_data):
-    device_data
-    device_watch = {
-		"plug": {
-			"target_capability": "measure_power",
-			"interval": 2
-		}
-    }
+def plugs(text):
+    
+	if "watt" in text:
+		value = get_status(PLUG_DATA_ID, "measure_power")
+		return value if value else 0

@@ -6,6 +6,7 @@ from gtts import gTTS
 import speech_recognition as sr
 
 from src import global_var, timer
+from src.external_services.iot import plugs
 
 # Converting text to audio
 def speak(text):
@@ -35,9 +36,8 @@ def get_audio(r, source, lang, ET_deafault):
         print(f"ET_live {ET_live}")
         
         MAX = ET_deafault * 3
-        MIN = ET_deafault * 0.8
         # Check energy threshold of recording
-        if ET_live > MAX or ET_live < MIN:
+        if ET_live > MAX:
             print("Ignore command")
             global_var.misunderstanding_counter += 1
             return
@@ -49,14 +49,14 @@ def get_audio(r, source, lang, ET_deafault):
             if miss_timer is None:
                 global_var.misunderstanding_timer = time_now
             
-            # More than 5 min. has past
-            if (time_now - miss_timer) >= 300:
+            # More than 5 min. has past or the plug messure below 50W
+            if plugs.plugs("watt") < 50 or (time_now - miss_timer) >= 300:
                 global_var.misunderstanding_counter = 0
                 global_var.misunderstanding_timer = time_now
             else:
-                MIN = 400 * 0.8
-                print(f"Speak up, dafault ET are: 400")
+                MIN = 350
                 if ET_live < MIN:
+                    print(f"Speak up, dafault ET are: {MIN}")
                     return
         
         said = r.recognize_google(audio, language=lang) # Danish -> da-DK || English(US) -> en-US
