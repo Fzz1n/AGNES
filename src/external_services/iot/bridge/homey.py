@@ -31,30 +31,34 @@ def get_devices():
         return rooms
     
     headers = {"Authorization": f"Bearer {HOMEY_KEY}"}
-    response = requests.get(REST_API + "devices/device/", headers=headers, timeout=5)
-    raw_devices = response.json()
-    devices = {}
-    lights = {}
-    for id, device in raw_devices.items():
-        if device["zone"] not in rooms:
-            return "Room does not exists"
-        
-        if "dim" in device["capabilities"]:
-            lights[device["name"].lower()] = {
-                "id": id,
-                "room": rooms[device["zone"]].lower()
-            }
-        else:
-            if device["class"] == "remote":
-                continue
-            devices[device["name"].lower()] = {
-                "id": id,
-                "room": rooms[device["zone"]].lower(),
-                "capabilities": device["capabilities"]
-            }
-    global_var.set_global_var("iot_devices", str(devices))
-    global_var.set_global_var("light_devices", str(lights))
-    return lights, devices
+    try:
+        response = requests.get(REST_API + "devices/device/", headers=headers, timeout=5)
+        raw_devices = response.json()
+        devices = {}
+        lights = {}
+        for id, device in raw_devices.items():
+            if device["zone"] not in rooms:
+                return "Room does not exists"
+            
+            if "dim" in device["capabilities"]:
+                lights[device["name"].lower()] = {
+                    "id": id,
+                    "room": rooms[device["zone"]].lower()
+                }
+            else:
+                if device["class"] == "remote":
+                    continue
+                devices[device["name"].lower()] = {
+                    "id": id,
+                    "room": rooms[device["zone"]].lower(),
+                    "capabilities": device["capabilities"]
+                }
+        global_var.set_global_var("iot_devices", str(devices))
+        global_var.set_global_var("light_devices", str(lights))
+        return lights, devices
+    except Exception as e:
+        print("Fail to get IoT devices")
+        return
 
 def get_status(device_id, get_value):
     url = REST_API + f"devices/device/{device_id}"

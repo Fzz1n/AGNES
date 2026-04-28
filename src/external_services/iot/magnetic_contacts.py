@@ -17,5 +17,5 @@ def manget_contacts(device_data):
 	while True:
 		door = get_device_current_value("door magnet", "alarm_contact")
 		if door:
-			sound_effects.play_mp3("alarms/chinese_alarm")
+			sound_effects.play_mp3_with_custom_volume("alarms/chinese_alarm", 50)
 		time.sleep(3)

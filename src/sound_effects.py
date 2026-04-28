@@ -2,7 +2,7 @@ import platform
 import subprocess
 
 # Adjusting the sound depending on platform (Linux or Windows)
-def adjust_sound(volume):
+def adjust_volume(volume):
     # Making sure it's between 0 and 100%
     if not 0 <= volume <= 100:
         return "Not a valid input"
@@ -18,6 +18,22 @@ def adjust_sound(volume):
 
     return f"The volume is set to {volume}"
 
+# Gets the current volume level
+def current_volume():
+    system = platform.system()
+
+    if system == "Windows":
+        from pycaw.pycaw import AudioUtilities
+        device = AudioUtilities.GetSpeakers()
+        volume = device.EndpointVolume
+        volume_level = volume.GetMasterVolumeLevelScalar() * 100
+        return int(volume_level)    
+    
+    elif system == "Linux":
+        import alsaaudio
+        mixer = alsaaudio.Mixer()
+        return int(mixer.getvolume()[0])
+
 #  Plays MP3 files, dependign on platfrom (Linux or Windows)
 def play_mp3(soundname):
     filename = f"src/mp3_files/{soundname}.mp3"
@@ -29,3 +45,16 @@ def play_mp3(soundname):
     elif system == "Windows":
         import playsound
         playsound.playsound(filename)
+
+def play_mp3_with_custom_volume(file, volume_level):
+    # Save current volume
+    old_volume = current_volume()
+
+    # Change volume
+    adjust_volume(volume_level)
+
+    # Play sound
+    play_mp3(file)
+
+    # Go back to teh old volume 
+    adjust_volume(old_volume)
