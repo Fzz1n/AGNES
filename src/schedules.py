@@ -8,11 +8,12 @@ TIMEZONE = os.environ["timezone"]
 
 # Diff. function that shall run automatically
 def jobs():
-    schedule.every().monday.at("07:00", TIMEZONE).do(notes.send_note) # Sends weekley usage_report
-    
-    # Monetoring IOT devices
-    device_thread = threading.Thread(target = start_monetoring_devices, daemon = True)
-    device_thread.start()
+	schedule.every().monday.at("07:00", TIMEZONE).do(notes.send_note) # Sends weekley usage_report
+
+	# Monetoring IOT devices (Only for Homey bridge)
+	if os.environ["homey_key"] and os.environ["homey_ip_address"]:
+		device_thread = threading.Thread(target = start_monetoring_devices, daemon = True)
+		device_thread.start()
 
 def start_monetoring_devices():
 	devices_data = global_var.get_global_var("iot_devices")

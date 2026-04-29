@@ -6,6 +6,7 @@ import schedule
 from wakeonlan import send_magic_packet
 
 from src.external_services.iot import light
+from src.external_services.iot.bridge import hue_light
 from src.voice_communication import speak, get_audio
 from src.external_services import weather, calendar
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
@@ -18,6 +19,15 @@ def main():
 
     if old_date is None:
         global_var.set_global_var("todays_date", timer.todays_date())
+
+    # Choose the IOT bridge: Phillips Hue or Homey
+    controle_light = None
+    hue_bridge = os.environ["hue_username"] and os.environ["hue_ip_address"]
+    homey_bridge = os.environ["homey_key"] and os.environ["homey_ip_address"]
+    if homey_bridge:
+        controle_light = light.controlling_lights
+    elif hue_bridge:
+        controle_light = hue_light.controlling_lights
 
     # Set up microphone settings
     r = sr.Recognizer()
@@ -207,9 +217,11 @@ def main():
                     else:
                         global_var.set_global_var("night_light_level", value)
                         speak("changed is confirmed")
-                else:
-                    t = threading.Thread(target=light.controlling_lights, args=(text,))
+                elif controle_light:
+                    t = threading.Thread(target=controle_light, args=(text,))
                     t.start()
+                else:
+                    speak("Please insert bridge data to control the light")
             elif "update iot devices" in text:
                 from src.external_services.iot.bridge.homey import get_devices
                 iot_devices = get_devices()
