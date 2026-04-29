@@ -1,7 +1,11 @@
-import time
+import os, time, threading
+from dotenv import load_dotenv
+load_dotenv()
 
 from src.external_services.iot.bridge.homey import update_status, get_device_current_value
-from src import sound_effects
+from src import sound_effects, voice_communication
+
+SEC_CODE = os.environ["secret_code"]
 
 def manget_contacts(device_data):
 	devices_to_watch ={ 
@@ -19,3 +23,35 @@ def manget_contacts(device_data):
 		if door:
 			sound_effects.play_mp3_with_custom_volume("alarms/chinese_alarm", 50)
 		time.sleep(3)
+
+def door_alarm():
+	time.sleep(300)
+	while True:
+		door = get_device_current_value("door magnet", "alarm_contact")
+		if door:
+			stop_event = threading.Event()
+			t = threading.Thread(target=alarm_countdown, args=(stop_event,), daemon = True)
+			t.start()
+
+			# Compare teh password to the one in the env  
+			res = voice_communication.get_audio_once()
+			while res != SEC_CODE:
+				res = voice_communication.get_audio_once()
+
+			stop_event.set()
+			break
+		time.sleep(3)
+
+def alarm_countdown(stop):
+	voice_communication.speak("The alarm will go off in 30 sec.")
+	
+	# 30 sec. countdown, stops if the event (stop) ends
+	for sec in range(30):
+		if stop.is_set():
+			voice_communication.speak("Alarm stopped")
+			return
+		time.sleep(1)
+	
+	# Alarm goes off
+	while not stop.is_set():
+		sound_effects.play_mp3("alarms/danger_alarm")

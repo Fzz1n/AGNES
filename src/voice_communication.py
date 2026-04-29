@@ -80,3 +80,15 @@ def get_audio(r, source, lang, ET_deafault):
         except Exception as e:
             print("Uninspected error:", e)
             continue
+
+def get_audio_once():
+	import speech_recognition as sr
+	r = sr.Recognizer()
+	r.pause_threshold = 1.0 
+	r.dynamic_energy_threshold = False
+	r.energy_threshold = global_var.get_global_var("default_energy_threshold")
+	with sr.Microphone() as source:
+		while True:
+			text = get_audio(r, source, "en-US", r.energy_threshold)
+			if text:
+				return text

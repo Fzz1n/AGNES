@@ -6,6 +6,7 @@ import schedule
 from wakeonlan import send_magic_packet
 
 from src.external_services.iot import light
+from src.external_services.iot import magnetic_contacts
 from src.external_services.iot.bridge import hue_light
 from src.voice_communication import speak, get_audio
 from src.external_services import weather, calendar
@@ -100,6 +101,10 @@ def main():
                 sec = converter.get_time(text)
                 timer.countdown(sec)
                 speak("I'm back bitches!!")
+            elif "activate alarm" in text:
+                speak("The alarm will activate in 5 min.")
+                t = threading.Thread(target=magnetic_contacts.door_alarm, daemon = True)
+                t.start()
             elif "time" in text:
                 phrase = "timer countdown"
                 if "left" in text:
@@ -117,7 +122,7 @@ def main():
                     sec = converter.get_time(text)
                     if sec:
                         speak("copy that")
-                        t = threading.Thread(target=timer.countdown, args=(sec,))
+                        t = threading.Thread(target=timer.countdown, args=(sec,), daemon = True)
                         t.start()
             elif "weather" in text:
                 phrase = "weather"
@@ -218,7 +223,7 @@ def main():
                         global_var.set_global_var("night_light_level", value)
                         speak("changed is confirmed")
                 elif controle_light:
-                    t = threading.Thread(target=controle_light, args=(text,))
+                    t = threading.Thread(target=controle_light, args=(text,), daemon = True)
                     t.start()
                 else:
                     speak("Please insert bridge data to control the light")
@@ -248,7 +253,7 @@ def main():
             elif "send" in text:
                 phrase = "reading notes"
                 if "usage report" in text:
-                    t = threading.Thread(target=notes.send_note)
+                    t = threading.Thread(target=notes.send_note, daemon = True)
                     t.start()
             elif "exit" in text:
                 notes.write("usage_log","exit the program")
