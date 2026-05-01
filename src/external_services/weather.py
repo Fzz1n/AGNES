@@ -88,7 +88,7 @@ def get_current_gps_coordinates():
         return None
 
 # Collectiong the nessary weather data 
-def weather_station():
+def weather_station(command):
     coordinates = global_var.get_global_var("coordinates")
     if coordinates is None:
         coordinates = get_current_gps_coordinates()
@@ -102,7 +102,7 @@ def weather_station():
     latitude, longitude = coordinates
     
     weather_data = global_var.get_global_var("weather_data")
-    if weather_data is None or timer.older_than_x_days(global_var.get_global_var("weather_data_age"), 3): # max 3 days
+    if weather_data is None or "today" in command or "tomorrow" in command or timer.older_than_x_days(global_var.get_global_var("weather_data_age"), 3): # max 3 days
         print("Finding new weather data")
         weather_data = get_weather_data(latitude, longitude)
         if weather_data is None:
@@ -129,12 +129,11 @@ def weather_forcast(item, when):
 
 # Look up the diff. weather data giving: todat, tomorrow, or a weekday
 def lookup_weather(text):
-    weather_data = weather_station()
+    weather_data = weather_station(text)
     if isinstance(weather_data, str) or weather_data is None:
         print(f"No data found, error: {weather_data}")
     
     weather_by_day = {item["day"]: item for item in weather_data}
-
     if "today" in text:
         today = timer.todays_weekday_name().lower()
         return weather_forcast(weather_by_day[today], "today")
