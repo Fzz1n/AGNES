@@ -13,7 +13,10 @@ def adjust_volume(volume):
         pyvolume.custom(percent=volume)
 
     elif system == "Linux":
-        subprocess.run(["amixer", "-c", "2", "set", "PCM", f"{volume}%"]) # Replace with yours speaker
+        subprocess.run(["amixer", "-c", "2", "set", "PCM", f"{volume}%"], # Replace with yours speaker
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
     return f"The volume is set to {volume}"
 

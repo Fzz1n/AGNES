@@ -2,8 +2,8 @@ import os, time, threading
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.external_services.iot.bridge.homey import update_status, get_device_current_value
-from src import sound_effects, voice_communication
+from src.external_services.iot.bridge.homey import update_status, get_device_current_value, get_status
+from src import sound_effects, voice_communication, global_var
 
 SEC_CODE = os.environ["secret_code"]
 
@@ -25,20 +25,36 @@ def manget_contacts(device_data):
 		time.sleep(3)
 
 def door_alarm():
-	time.sleep(300)
+	import ast
+	devices_data = ast.literal_eval(global_var.get_global_var("iot_devices"))
+	PLUG_DATA = devices_data["plug"]
+	PLUG_DATA_ID = PLUG_DATA["id"]
+
+	time.sleep(3)
 	while True:
-		door = get_device_current_value("door magnet", "alarm_contact")
+		#door = get_device_current_value("door magnet", "alarm_contact")
+		door = get_status(PLUG_DATA_ID, "measure_power")
 		if door:
 			stop_event = threading.Event()
 			t = threading.Thread(target=alarm_countdown, args=(stop_event,), daemon = True)
 			t.start()
 
-			# Compare teh password to the one in the env  
-			res = voice_communication.get_audio_once()
-			while res != SEC_CODE:
-				res = voice_communication.get_audio_once()
+			while True:
+				try:
+					res = global_var.audio_queue.get(timeout=1)
+					if res == SEC_CODE:
+						break
 
+				except:
+					pass
+			
 			stop_event.set()
+			global_var.save_audio.clear()
+			try:
+				while True:
+					global_var.audio_queue.get_nowait()
+			except:
+				pass
 			break
 		time.sleep(3)
 

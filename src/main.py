@@ -41,7 +41,7 @@ def main():
         
         while True:
             # r.adjust_for_ambient_noise(source, duration=1) # auto calibrate sound    
-            text = get_audio(r, source, "en-US", r.energy_threshold)
+            text = get_audio(r, source, "en-US", r.energy_threshold, global_var.save_audio)
             schedule.run_pending()
             if text is None or global_var.get_global_var("react_by_name") and "agnes" not in text:
                 continue
@@ -102,9 +102,13 @@ def main():
                 timer.countdown(sec)
                 speak("I'm back bitches!!")
             elif "activate alarm" in text:
-                speak("The alarm will activate in 5 min.")
-                t = threading.Thread(target=magnetic_contacts.door_alarm, daemon = True)
-                t.start()
+                if global_var.save_audio.is_set():
+                    speak("The alarm is already activated")
+                else:
+                    speak("The alarm will activate in 5 min.")
+                    global_var.save_audio.set()
+                    t = threading.Thread(target=magnetic_contacts.door_alarm, daemon = True)
+                    t.start()
             elif "time" in text:
                 phrase = "timer countdown"
                 if "left" in text:

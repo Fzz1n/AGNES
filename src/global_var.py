@@ -1,9 +1,12 @@
 import threading
 import sqlite3
+from queue import Queue
 
+audio_queue = Queue()
 MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
 WEEKSDAY_NAME = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 stop_event = threading.Event()
+save_audio = threading.Event()
 misunderstanding_counter = 0
 misunderstanding_timer = None
 time_left = 0
