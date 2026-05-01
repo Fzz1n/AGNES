@@ -25,15 +25,9 @@ def manget_contacts(device_data):
 		time.sleep(3)
 
 def door_alarm():
-	import ast
-	devices_data = ast.literal_eval(global_var.get_global_var("iot_devices"))
-	PLUG_DATA = devices_data["plug"]
-	PLUG_DATA_ID = PLUG_DATA["id"]
-
 	time.sleep(300)
 	while True:
-		#door = get_device_current_value("door magnet", "alarm_contact")
-		door = get_status(PLUG_DATA_ID, "measure_power")
+		door = get_device_current_value("door magnet", "alarm_contact")
 		if door:
 			stop_event = threading.Event()
 			t = threading.Thread(target=alarm_countdown, args=(stop_event,), daemon = True)
