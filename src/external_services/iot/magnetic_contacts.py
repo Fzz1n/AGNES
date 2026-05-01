@@ -30,7 +30,7 @@ def door_alarm():
 	PLUG_DATA = devices_data["plug"]
 	PLUG_DATA_ID = PLUG_DATA["id"]
 
-	time.sleep(3)
+	time.sleep(300)
 	while True:
 		#door = get_device_current_value("door magnet", "alarm_contact")
 		door = get_status(PLUG_DATA_ID, "measure_power")
