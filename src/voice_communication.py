@@ -10,6 +10,7 @@ from src.external_services.iot import plugs
 
 # Converting text to audio
 def speak(text):
+    global_var.pause_audio.set()
     global_var.set_global_var("last_answer", text) # Saving the answer
     tts = gTTS(text=text, lang="en")
     filename = "voice.mp3"
@@ -24,10 +25,13 @@ def speak(text):
         playsound.playsound(filename)
 
     os.remove(filename)
+    global_var.pause_audio.clear()
 
 # Converting audio to text
 def get_audio(r, source, lang, ET_deafault, save_audio):
     while True:
+        if global_var.pause_audio.is_set():
+            return
         try:
             audio = r.listen(source, phrase_time_limit = 10) # addition ", timeout=10, phrase_time_limit=8"
             

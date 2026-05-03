@@ -7,6 +7,7 @@ MONTHS = ["january", "february", "march", "april", "may", "june", "july", "augus
 WEEKSDAY_NAME = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 stop_event = threading.Event()
 save_audio = threading.Event()
+pause_audio = threading.Event()
 misunderstanding_counter = 0
 misunderstanding_timer = None
 time_left = 0
