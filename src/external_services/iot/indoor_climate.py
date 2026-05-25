@@ -18,10 +18,10 @@ def thermometers(device_data):
 	while True:
 		within_time = "07:00:00" < timer.current_time() < "22:00:00"
 		humidity = get_device_current_value("thermometer", "measure_humidity")
-		window_bed_open = get_device_current_value("window sensor0", "alarm_contact")
-		window_living_open = get_device_current_value("window sensor1", "alarm_contact")
 		
 		if humidity and humidity > 40:
+			window_bed_open = get_device_current_value("window sensor0", "alarm_contact")
+			window_living_open = get_device_current_value("window sensor1", "alarm_contact")
 			if within_time and not (window_bed_open or window_living_open):
 				voice_communication.speak("Please open the window")
 			else:
