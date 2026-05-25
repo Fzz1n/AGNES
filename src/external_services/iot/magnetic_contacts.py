@@ -10,19 +10,61 @@ SEC_CODE = os.environ["secret_code"]
 def manget_contacts(device_data):
 	devices_to_watch ={ 
 		"door magnet": {
-			"target_capability": "alarm_contact",
+			"target_capability": ["alarm_contact"],
+			"interval": 3
+		},
+		"window sensor0": {
+			"target_capability": ["alarm_contact"],
+			"interval": 3
+		},
+		"window sensor1": {
+			"target_capability": ["alarm_contact"],
 			"interval": 3
 		}
 	}
 
 	threads_num = update_status(device_data, devices_to_watch)
 	print(f"Monitors: {threads_num} magnets")
-
+	already_bedroom_window_open = False
+	already_livingroom_window_open = False
 	while True:
-		door = get_device_current_value("door magnet", "alarm_contact")
-		if door:
+		door_open = get_device_current_value("door magnet", "alarm_contact")
+		window_bed_open = get_device_current_value("window sensor0", "alarm_contact")
+		window_living_open = get_device_current_value("window sensor1", "alarm_contact")
+		
+		if door_open:
 			sound_effects.play_mp3_with_custom_volume("alarms/chinese_alarm", 50)
+		
+		if window_bed_open and not already_bedroom_window_open:
+			already_bedroom_window_open = True
+			window_bed_closed = threading.Event()
+			t = threading.Thread(target=watch_open_window, args=("bedroom", window_bed_closed,), daemon = True)
+			t.start()
+		elif not window_bed_open and already_bedroom_window_open:
+			already_bedroom_window_open = True
+			if window_bed_closed:
+				window_bed_closed.set()
+
+		if window_living_open and not already_livingroom_window_open:
+			already_livingroom_window_open = True
+			window_living_closed = threading.Event()
+			t = threading.Thread(target=watch_open_window, args=("livingroom", window_living_closed,), daemon = True)
+			t.start()
+		elif not window_living_open and already_livingroom_window_open:
+			already_livingroom_window_open = True
+			if window_living_closed:
+				window_living_closed.set()
+
 		time.sleep(3)
+
+def watch_open_window(room, open):
+	while not open.is_set():
+		temp = get_device_current_value("thermometer", "measure_temperature")
+		humidity = get_device_current_value("thermometer", "measure_humidity")
+		data_exist = temp and humidity
+		if data_exist and (temp < 18 or humidity < 40 and temp < 23):
+			voice_communication.speak(f"Please close the {room} window")
+		time.sleep(240)
 
 def door_alarm():
 	time.sleep(300)

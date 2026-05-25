@@ -6,7 +6,7 @@ from src import voice_communication, timer
 def thermometers(device_data):
 	devices_to_watch = {
 		"thermometer": {
-			"target_capability": "measure_humidity",
+			"target_capability": ["measure_temperature", "measure_humidity"],
 			"interval": 30
 		}
 	}

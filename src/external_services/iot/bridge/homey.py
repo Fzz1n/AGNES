@@ -77,13 +77,15 @@ def auto_get_status(url, device_name, get_value, time_interval=0):
 		try:
 			r = requests.get(url, headers=headers, timeout=5)
 			response = r.json()
-			value = response.get("capabilitiesObj", {}).get(get_value, {}).get("value")
-
-			old_value = global_var.devices_current_values.get(device_name, {}).get(get_value)
-			
-			if value != old_value:
-				print(f"[{device_name}] {get_value}: {value}", end='\r')
-				global_var.devices_current_values[device_name] = {get_value: value, "timestamp": time.time()}
+			for value in get_value:
+				res_value = response.get("capabilitiesObj", {}).get(value, {}).get("value")
+				old_value = global_var.devices_current_values.get(device_name, {}).get(value)
+				if res_value != old_value:
+					if device_name not in global_var.devices_current_values:
+						global_var.devices_current_values[device_name] = {}
+					#print(f"[{device_name}] {value}: {res_value}")
+					global_var.devices_current_values[device_name][value] = res_value
+					global_var.devices_current_values[device_name]["timestamp"] = time.time()
 			
 		except Exception as e:
 			print("GET error. Try again later", e)
