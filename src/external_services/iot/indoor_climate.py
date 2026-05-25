@@ -22,7 +22,7 @@ def thermometers(device_data):
 		window_living_open = get_device_current_value("window sensor1", "alarm_contact")
 		
 		if humidity and humidity > 40:
-			if within_time and (not window_bed_open or not window_living_open):
+			if within_time and not (window_bed_open or window_living_open):
 				voice_communication.speak("Please open the window")
 			else:
 				open_window_buffer = True
