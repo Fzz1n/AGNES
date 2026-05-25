@@ -31,9 +31,11 @@ def manget_contacts(device_data):
 		door_open = get_device_current_value("door magnet", "alarm_contact")
 		window_bed_open = get_device_current_value("window sensor0", "alarm_contact")
 		window_living_open = get_device_current_value("window sensor1", "alarm_contact")
-		
+
 		if door_open:
+			global_var.pause_audio.set()
 			sound_effects.play_mp3_with_custom_volume("alarms/chinese_alarm", 50)
+			global_var.pause_audio.clear()
 		
 		if window_bed_open and not already_bedroom_window_open:
 			already_bedroom_window_open = True
