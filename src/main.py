@@ -1,8 +1,5 @@
-import os
-import time
-import threading
+import os, time, threading, schedule, random, pyjokes
 import speech_recognition as sr
-import schedule
 from wakeonlan import send_magic_packet
 
 from src.external_services.iot import light
@@ -248,9 +245,13 @@ def main():
                     speak(cal_res)
             elif "joke" in text:
                 phrase = "telling a joke"
-                speak("what do you call a cow without legs")
-                time.sleep(2)
-                speak("ground beef")
+                r1 = random.randint(0, 10)
+                if r1 == 0:
+                    speak("what do you call a cow without legs")
+                    time.sleep(2)
+                    speak("ground beef")
+                else:
+                    speak(pyjokes.get_joke())
             elif "please repeat" in text or "come again" in text or "sorry" in text:
                 phrase = "repeat of last sentence"
                 speak(global_var.get_global_var("last_answer"))
