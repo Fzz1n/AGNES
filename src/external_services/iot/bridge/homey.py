@@ -1,13 +1,8 @@
-import os
-import requests
-import json
-import time
+import os, requests, time, threading
 from dotenv import load_dotenv
 load_dotenv()
-import ast
-import threading
 
-from src import calc, converter, global_var, voice_communication
+from src import global_var
 
 HOMEY_KEY = os.environ["homey_key"]
 HOMEY_IP_ADDRESS = os.environ["homey_ip_address"]
@@ -20,7 +15,7 @@ def get_rooms():
         raw_rooms = response.json()
         rooms = {}
         for id, room in raw_rooms.items():
-            rooms[id] = room['name']
+            rooms[id] = room['name'].lower()
         return rooms
     except:
         return "No rooms found"
@@ -48,7 +43,7 @@ def get_devices():
             else:
                 if device["class"] == "remote":
                     continue
-                devices[device["name"].lower()] = {
+                devices[f"{device['name'].lower()}_{rooms[device['zone']].lower()}"] = {
                     "id": id,
                     "room": rooms[device["zone"]].lower(),
                     "capabilities": device["capabilities"]

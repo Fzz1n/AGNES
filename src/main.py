@@ -4,13 +4,13 @@ from wakeonlan import send_magic_packet
 
 from src.external_services import weather, calendar
 from src.external_services.iot import light, magnetic_contacts, indoor_climate
+from src.external_services.iot.services import doors
 from src.external_services.iot.bridge import hue_light
 from src.external_services.iot.bridge.homey import get_devices
 from src.voice_communication import speak, get_audio
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
 
 def start_monetoring_devices():
-	global_var.current_weather = weather.update_current_weather()
 	devices_data = global_var.get_global_var("iot_devices")
 	if not devices_data:
 		devices_data = get_devices()
@@ -123,7 +123,7 @@ def main():
                 else:
                     speak("The alarm will activate in 5 min.")
                     global_var.save_audio.set()
-                    t = threading.Thread(target=magnetic_contacts.door_alarm, daemon = True)
+                    t = threading.Thread(target=doors.door_alarm, daemon = True)
                     t.start()
             elif "time" in text:
                 phrase = "timer countdown"

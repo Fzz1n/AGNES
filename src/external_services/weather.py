@@ -148,6 +148,15 @@ def lookup_weather(text):
     if isinstance(weather_data, str) or weather_data is None:
         print(f"No data found, error: {weather_data}")
     
+    if "now" in text:
+        t = weather_data["temp"]
+        w = weather_data["wind"]
+        p = weather_data["precipitation"]
+        weather_projection = f"the temperature is {round(t)} °C, with wind speeds of {round(w)} m/s"
+        if (p > 0):
+            weather_projection += f" and {round(p)} mm of rain."
+        return weather_projection
+    
     weather_by_day = {item["day"]: item for item in weather_data}
     if "today" in text:
         today = timer.todays_weekday_name().lower()
@@ -163,7 +172,7 @@ def lookup_weather(text):
                 
     return "Couldn't find any weather projection"
 
-def update_current_weather():
+def update_current_weather(devices):
     while True:
         current_hour = timer.current_time_hour()
         if current_hour[0] == "0":
