@@ -64,9 +64,20 @@ def watch_open_window(room, open):
 		temp = get_device_current_value("thermometer", "measure_temperature")
 		humidity = get_device_current_value("thermometer", "measure_humidity")
 		data_exist = temp and humidity
-		if data_exist and (temp < 18 or humidity < 40 and temp < 23):
+		if should_window_be_closed(temp) or (data_exist and (temp < 18 or humidity < 40 and temp < 23)):
 			voice_communication.speak(f"Please close the {room} window")
 		time.sleep(240)
+
+def should_window_be_closed(indoor_temp):
+	if not indoor_temp:
+		return True
+	temp = global_var.current_weather.get("temp",0) > indoor_temp
+	wind = global_var.current_weather.get("wind",0) > 25
+	humidity = global_var.current_weather.get("humidity",0) > 80
+	precipitation = global_var.current_weather.get("precipitation",1) > 0
+	rain = global_var.current_weather.get("rain",1) > 0
+	snow = global_var.current_weather.get("snow",1) > 0
+	return temp or wind or humidity or precipitation or rain or snow
 
 def door_alarm():
 	time.sleep(300)

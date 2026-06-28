@@ -23,6 +23,9 @@ def current_time_sec():
 def current_time():
     return time.strftime("%X")
 
+def current_time_hour():
+    return time.strftime("%H")
+
 # Get todays date
 def todays_date():
     return datetime.date.today().strftime("%d-%m-%Y")

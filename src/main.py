@@ -1,13 +1,30 @@
-import os, time, threading, schedule, random, pyjokes
+import os, time, threading, schedule, random, pyjokes, ast
 import speech_recognition as sr
 from wakeonlan import send_magic_packet
 
-from src.external_services.iot import light
-from src.external_services.iot import magnetic_contacts
-from src.external_services.iot.bridge import hue_light
-from src.voice_communication import speak, get_audio
 from src.external_services import weather, calendar
+from src.external_services.iot import light, magnetic_contacts, indoor_climate
+from src.external_services.iot.bridge import hue_light
+from src.external_services.iot.bridge.homey import get_devices
+from src.voice_communication import speak, get_audio
 from src import global_var, schedules, sound_effects, calc, converter, timer, notes
+
+def start_monetoring_devices():
+	global_var.current_weather = weather.update_current_weather()
+	devices_data = global_var.get_global_var("iot_devices")
+	if not devices_data:
+		devices_data = get_devices()
+		devices_data = global_var.get_global_var("iot_devices")
+	devices_data = ast.literal_eval(devices_data)
+
+	devices_to_watch = [weather.update_current_weather, indoor_climate.thermometers, magnetic_contacts.manget_contacts]
+	for monitor_device in devices_to_watch:
+		threads = threading.Thread(
+			target = monitor_device,
+			args = (devices_data.copy(),),
+			daemon = True
+		)
+		threads.start()
 
 def main():
     # create/update DB and save todays date in it + start schedules
@@ -23,6 +40,8 @@ def main():
     hue_bridge = os.environ["hue_username"] and os.environ["hue_ip_address"]
     homey_bridge = os.environ["homey_key"] and os.environ["homey_ip_address"]
     if homey_bridge:
+        device_thread = threading.Thread(target = start_monetoring_devices, daemon = True)
+        device_thread.start()
         controle_light = light.controlling_lights
     elif hue_bridge:
         controle_light = hue_light.controlling_lights

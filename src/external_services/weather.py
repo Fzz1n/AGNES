@@ -1,7 +1,4 @@
-import os
-import geocoder
-import openmeteo_requests
-import requests_cache
+import os, geocoder, openmeteo_requests, requests_cache, time
 from retry_requests import retry
 from ast import literal_eval
 
@@ -9,12 +6,12 @@ from src import timer, global_var
 
 # Diff. api req: https://open-meteo.com/en/docs
 
-def get_weather_data(lat, lon):
+def get_weather_data(lat, lon, weather_now=False):
     # Setup the Open-Meteo API client with cache and retry on error
     cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
     retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
     openmeteo = openmeteo_requests.Client(session = retry_session)
-    TIMEZONE = os.environ["timezone"]
+    TIMEZONE = "Europe/Berlin"
 
     # Make sure all required weather variables are listed here
     # The order of variables in hourly or daily is important to assign them correctly below
@@ -58,6 +55,17 @@ def get_weather_data(lat, lon):
     hourly_snowfall = hourly.Variables(6).ValuesAsNumpy()
     hourly_rain = hourly.Variables(7).ValuesAsNumpy()
 
+    if not isinstance(weather_now, bool):
+        data_now = {
+            "temp": float(hourly_apparent_temperature[weather_now]),
+            "wind": float(hourly_wind_speed_10m[weather_now]),
+            "humidity": float(hourly_relative_humidity_2m[weather_now]),
+            "precipitation": float(hourly_precipitation[weather_now]),
+            "rain": float(hourly_rain[weather_now]),
+            "snow": float(hourly_snowfall[weather_now]),
+        }
+        return data_now
+
     weather_data = []
 
     for d in range(7):
@@ -100,6 +108,13 @@ def weather_station(command):
         print(f"Using old coordinates: {coordinates}")
         coordinates = literal_eval(coordinates)
     latitude, longitude = coordinates
+    
+    if "now" in command:
+        current_hour = timer.current_time_hour()
+        if current_hour[0] == "0":
+            current_hour = current_hour[1]
+        weather_data = get_weather_data(latitude, longitude, int(current_hour))
+        return weather_data
     
     weather_data = global_var.get_global_var("weather_data")
     if weather_data is None or "today" in command or "tomorrow" in command or timer.older_than_x_days(global_var.get_global_var("weather_data_age"), 3): # max 3 days
@@ -147,3 +162,15 @@ def lookup_weather(text):
                 return weather_forcast(weather_by_day[week_day], week_day)
                 
     return "Couldn't find any weather projection"
+
+def update_current_weather():
+    while True:
+        current_hour = timer.current_time_hour()
+        if current_hour[0] == "0":
+            current_hour = current_hour[1]
+        current_hour = int(current_hour)
+
+        if global_var.current_weather_hour is not current_hour:
+            global_var.current_weather_hour = current_hour
+            global_var.current_weather = weather_station("now")
+        time.sleep(900)
