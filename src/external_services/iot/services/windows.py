@@ -19,12 +19,12 @@ def should_window_be_open(room):
 			is_window_open = get_device_current_value(f"window magnet_{room}", "alarm_contact")
 			if is_window_open:
 				open_window_counter = 0
-			elif weather_ok:
+			elif weather_ok and is_window_open is not None:
 				if can_notify:
 					notify()
 				else:
 					open_window_buffer = True
-		elif open_window_buffer and weather_ok and can_notify:
+		elif open_window_buffer and weather_ok and can_notify and is_window_open is not None:
 			notify()
 			open_window_buffer = False
 		time.sleep(300)
