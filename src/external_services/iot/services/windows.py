@@ -22,10 +22,12 @@ def should_window_be_open(room):
 			elif weather_ok and is_window_open is not None:
 				if can_notify:
 					notify()
+					open_window_counter = 1
 				else:
 					open_window_buffer = True
 		elif open_window_buffer and weather_ok and can_notify and is_window_open is not None:
 			notify()
+			open_window_counter = 1
 			open_window_buffer = False
 		time.sleep(300)
 		
