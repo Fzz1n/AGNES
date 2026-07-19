@@ -1,31 +1,30 @@
-import os
-import platform
-import subprocess
-import audioop
+import os, platform, subprocess, audioop, threading
 from gtts import gTTS
 import speech_recognition as sr
+lock = threading.Lock()
 
 from src import global_var, timer
 from src.external_services.iot import plugs
 
 # Converting text to audio
 def speak(text):
-    global_var.pause_audio.set()
-    global_var.set_global_var("last_answer", text) # Saving the answer
-    tts = gTTS(text=text, lang="en")
-    filename = "voice.mp3"
-    tts.save(filename)
+    with threading.lock:
+        global_var.pause_audio.set()
+        global_var.set_global_var("last_answer", text) # Saving the answer
+        tts = gTTS(text=text, lang="en")
+        filename = "voice.mp3"
+        tts.save(filename)
 
-    system = platform.system()
+        system = platform.system()
 
-    if system == "Linux":
-        subprocess.run(["mpg123", "-q", filename])
-    elif system == "Windows":
-        import playsound
-        playsound.playsound(filename)
+        if system == "Linux":
+            subprocess.run(["mpg123", "-q", filename])
+        elif system == "Windows":
+            import playsound
+            playsound.playsound(filename)
 
-    os.remove(filename)
-    global_var.pause_audio.clear()
+        os.remove(filename)
+        global_var.pause_audio.clear()
 
 # Converting audio to text
 def get_audio(r, source, lang, ET_deafault, save_audio):
