@@ -8,7 +8,7 @@ from src.external_services.iot import plugs
 
 # Converting text to audio
 def speak(text):
-    with threading.lock:
+    with lock:
         global_var.pause_audio.set()
         global_var.set_global_var("last_answer", text) # Saving the answer
         tts = gTTS(text=text, lang="en")
