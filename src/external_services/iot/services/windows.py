@@ -43,16 +43,16 @@ def should_window_be_closed(room):
 			while window_open:
 				temp = get_device_current_value(f"thermometer_{room}", "measure_temperature")
 				humidity = get_device_current_value(f"thermometer_{room}", "measure_humidity")
-				window_open = get_device_current_value(F"window magnet_{room}", "alarm_contact")
-				data_exist = temp and humidity
+				data_exist = temp is not None and humidity is not None
 				
 				if not weather_allows_the_window_to_be_open(temp) or (data_exist and (temp < 18 or humidity < 40 and temp < 23)):
 					target_room = room if "room" in room else room + " room"
 					voice_communication.speak(f"Please close the {target_room} window")
-				time.sleep(250)
+				time.sleep(10)
+				window_open = get_device_current_value(F"window magnet_{room}", "alarm_contact")
 
 		elif not window_open and window_already_open:
-			window_already_open = True
+			window_already_open = False
 		
 		time.sleep(3)
 
