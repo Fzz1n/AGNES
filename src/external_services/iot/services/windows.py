@@ -10,7 +10,7 @@ def should_window_be_open(room):
 		temp = get_device_current_value(f"thermometer_{room}", "measure_temperature")
 		humidity = get_device_current_value(f"thermometer_{room}", "measure_humidity")
 		weather_ok = weather_allows_the_window_to_be_open(temp)
-		can_notify = within_time and open_window_counter < 3
+		can_notify = within_time and open_window_counter < 2
 
 		def notify():
 			voice_communication.speak(f"Please open the {room} window")
@@ -22,10 +22,12 @@ def should_window_be_open(room):
 			elif weather_ok and is_window_open is not None:
 				if can_notify:
 					notify()
+					open_window_counter += 1
 				else:
 					open_window_buffer = True
 		elif open_window_buffer and weather_ok and can_notify and is_window_open is not None:
 			notify()
+			open_window_counter += 1
 			open_window_buffer = False
 		time.sleep(300)
 		
